@@ -1,0 +1,45 @@
+{
+  "name": "task-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx --watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.4",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.5",
+    "@types/express-ejs-layouts": "^2.5.4",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.10.1",
+    "@types/shelljs": "^0.8.17",
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.11",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.1.0",
+    "shelljs": "^0.10.0",
+    "ts-node": "^10.9.2",
+    "tslint": "^5.20.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

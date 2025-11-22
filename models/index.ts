@@ -1,4 +1,4 @@
-import { BaseModel } from "../lib/BaseModel";
+import { BaseModel } from "@lib/BaseModel";
 
 import type { User } from "./user";
 import type { Artist } from "./artist";

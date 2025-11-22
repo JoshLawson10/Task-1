@@ -1,4 +1,4 @@
-import { db } from "../config/database";
+import { db } from "@config/database";
 
 export class BaseModel<T extends Record<string, any>> {
   constructor(

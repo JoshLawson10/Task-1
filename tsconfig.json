@@ -8,7 +8,12 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "."
+    "baseUrl": "./src",
+    "paths": {
+      "@config/*": ["../config/*"],
+      "@lib/*": ["../lib/*"],
+      "@models/*": ["../models/*"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["dist"]

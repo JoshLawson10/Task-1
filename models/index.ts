@@ -7,24 +7,40 @@ import type { Track } from "./track";
 import type { Playlist } from "./playlist";
 import type { PlaylistTrack } from "./playlistTrack";
 
-export const UsersModel = new BaseModel<User>("users", "user_id");
-export const ArtistsModel = new BaseModel<Artist>("artists", "artist_id");
-export const AlbumsModel = new BaseModel<Album>("albums", "album_id");
-export const TracksModel = new BaseModel<Track>("tracks", "track_id");
-export const PlaylistsModel = new BaseModel<Playlist>("playlists", "playlist_id");
-export const PlaylistTracksModel = new BaseModel<PlaylistTrack>("playlist_tracks", "");
+const UsersModel = new BaseModel<User>("users", "user_id");
+const ArtistsModel = new BaseModel<Artist>("artists", "artist_id");
+const AlbumsModel = new BaseModel<Album>("albums", "album_id");
+const TracksModel = new BaseModel<Track>("tracks", "track_id");
+const PlaylistsModel = new BaseModel<Playlist>("playlists", "playlist_id");
+const PlaylistTracksModel = new BaseModel<PlaylistTrack>("playlist_tracks", "");
 
-export const Users = {
-  ...UsersModel,
+function extendModel<
+  T extends Record<string, any>,
+  M extends Record<string, any>,
+>(model: BaseModel<T>, extensions: M) {
+  return {
+    findMany: model.findMany.bind(model),
+    findUnique: model.findUnique.bind(model),
+    findById: model.findById.bind(model),
+    create: model.create.bind(model),
+    update: model.update.bind(model),
+    updateById: model.updateById.bind(model),
+    delete: model.delete.bind(model),
+    deleteById: model.deleteById.bind(model),
+    count: model.count.bind(model),
+    exists: model.exists.bind(model),
+    findManyPaginated: model.findManyPaginated.bind(model),
+    ...extensions,
+  };
+}
 
+export const Users = extendModel(UsersModel, {
   playlists(userId: number): Promise<Playlist[]> {
     return PlaylistsModel.findMany({ user_id: userId });
-  }
-};
+  },
+});
 
-export const Artists = {
-  ...ArtistsModel,
-
+export const Artists = extendModel(ArtistsModel, {
   albums(artistId: number): Promise<Album[]> {
     return AlbumsModel.findMany({ artist_id: artistId });
   },
@@ -35,12 +51,10 @@ export const Artists = {
 
     const albums = await AlbumsModel.findMany({ artist_id });
     return { ...artist, albums };
-  }
-};
+  },
+});
 
-export const Albums = {
-  ...AlbumsModel,
-
+export const Albums = extendModel(AlbumsModel, {
   tracks(albumId: number): Promise<Track[]> {
     return TracksModel.findMany({ album_id: albumId });
   },
@@ -51,23 +65,22 @@ export const Albums = {
 
     const tracks = await TracksModel.findMany({ album_id });
     return { ...album, tracks };
-  }
-};
+  },
+});
 
-export const Tracks = {
-  ...TracksModel,
-
+export const Tracks = extendModel(TracksModel, {
   async play(track_id: number) {
     const track = await TracksModel.findUnique({ track_id });
     if (!track) throw new Error("Track not found");
 
-    await TracksModel.update({ track_id }, { play_count: track.play_count + 1 });
-  }
-};
+    await TracksModel.update(
+      { track_id },
+      { play_count: track.play_count + 1 },
+    );
+  },
+});
 
-export const Playlists = {
-  ...PlaylistsModel,
-
+export const Playlists = extendModel(PlaylistsModel, {
   tracks(playlist_id: number) {
     return PlaylistTracksModel.findMany({ playlist_id });
   },
@@ -81,11 +94,11 @@ export const Playlists = {
       track_id,
       added_by,
       added_at: new Date().toISOString(),
-      position
+      position,
     });
-  }
-};
+  },
+});
 
-export const PlaylistTracks = {
-  ...PlaylistTracksModel
-};
+export const PlaylistTracks = extendModel(PlaylistTracksModel, {});
+
+export { User, Artist, Album, Track, Playlist, PlaylistTrack };

@@ -4,22 +4,19 @@ import { Album, Albums, Artist, Artists, Track, Tracks } from "@models/index";
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const { artist_id, title, release_year, cover_image_url } = req.body;
+  const { artist_id, title } = req.body;
 
-  if (!artist_id || !title || !release_year || !cover_image_url) {
+  if (!artist_id || !title) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const albumData: Partial<Album> = {
-    artist_id: artist_id,
-    album_title: title,
-    release_year: release_year,
-    cover_image_url: cover_image_url,
-    created_at: new Date().toISOString(),
-  };
-
   try {
-    const newAlbum: Album | null = await Albums.create(albumData);
+    const newAlbum: Album | null = await Albums.create({
+      data: {
+        ...req.body,
+        created_at: new Date().toISOString(),
+      },
+    });
 
     res.status(201).json(newAlbum);
   } catch (error) {

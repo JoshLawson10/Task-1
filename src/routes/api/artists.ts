@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
-import { Album, Albums, Artist, Artists, Track, Tracks } from "@models/index";
-import { db } from "@config/database";
+import { Album, Artist, Artists } from "@models/index";
 
 const router = Router();
 
@@ -60,9 +59,7 @@ router.get("/:id/albums", async (req: Request, res: Response) => {
   const artistId = req.params.id;
 
   try {
-    const albums: Album[] = await Albums.findMany({
-      artist_id: Number(artistId),
-    });
+    const albums: Album[] = await Artists.albums(Number(artistId));
 
     res.json(albums);
   } catch (error) {

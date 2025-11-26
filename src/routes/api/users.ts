@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
-import { User, Users } from "@models/index";
-import { db } from "@config/database";
+import { User, Users, Playlist } from "@models/index";
 
 const router = Router();
 
@@ -34,6 +33,19 @@ router.get("/:userId", async (req: Request, res: Response) => {
     res.json(user);
   } catch (error: any) {
     console.error("Error fetching user:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/:userId/playlists", async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    const playlists: Playlist[] = await Users.playlists(Number(userId));
+
+    res.json(playlists);
+  } catch (error: any) {
+    console.error("Error fetching user playlists:", error);
     res.status(500).json({ error: error.message });
   }
 });

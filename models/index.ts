@@ -81,8 +81,18 @@ export const Tracks = extendModel(TracksModel, {
 });
 
 export const Playlists = extendModel(PlaylistsModel, {
-  tracks(playlist_id: number) {
-    return PlaylistTracksModel.findMany({ playlist_id });
+  async tracks(playlist_id: number) {
+    const playlistTracks: PlaylistTrack[] = await PlaylistTracks.findMany({
+      playlist_id: Number(playlist_id),
+    });
+
+    const trackIds: number[] = playlistTracks.map((pt) => Number(pt.track_id));
+
+    const tracks = (
+      await Promise.all(trackIds.map((id) => Tracks.findById(id)))
+    ).filter((t): t is Track => Boolean(t));
+
+    return tracks;
   },
 
   async addTrack(playlist_id: number, track_id: number, added_by: number) {

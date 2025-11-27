@@ -1,21 +1,22 @@
 import { Router, Request, Response } from "express";
-import { Album, Albums, Artist, Artists, Track, Tracks } from "@models/index";
+import { Album, Albums, Track } from "@models/index";
 
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const { artist_id, title } = req.body;
+  const { artist_id, album_title } = req.body;
 
-  if (!artist_id || !title) {
+  if (!artist_id || !album_title) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
     const newAlbum: Album | null = await Albums.create({
-      data: {
-        ...req.body,
-        created_at: new Date().toISOString(),
-      },
+      artist_id,
+      album_title,
+      release_year: req.body.release_year,
+      cover_image_url: req.body.cover_image_url,
+      created_at: new Date().toISOString(),
     });
 
     res.status(201).json(newAlbum);
@@ -28,23 +29,18 @@ router.post("/", async (req: Request, res: Response) => {
 router.get("/", async (req: Request, res: Response) => {
   const { limit = 50, offset = 0 } = req.query;
 
-  const albums: Album[] = await Albums.findManyPaginated(
-    {},
-    Number(limit),
-    Number(offset),
-  );
+  try {
+    const albums: Album[] = await Albums.findManyPaginated(
+      {},
+      Number(limit),
+      Number(offset),
+    );
 
-  const albumsExtra = [];
-
-  for (const album of albums) {
-    const artist = await Albums.artist(album.album_id);
-    albumsExtra.push({
-      ...album,
-      artist_name: artist ? artist.artist_name : null,
-    });
+    res.json(albums);
+  } catch (error) {
+    console.error("Error fetching albums:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  res.json(albumsExtra);
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
@@ -57,9 +53,7 @@ router.get("/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Album not found" });
     }
 
-    const artist: Artist | null = await Albums.artist(album.artist_id);
-
-    res.json({ ...album, artist_name: artist ? artist.artist_name : null });
+    res.json(album);
   } catch (error) {
     console.error("Error fetching album:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -76,9 +70,7 @@ router.get("/:id/tracks", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Album not found" });
     }
 
-    const tracks: Track[] = await Tracks.findMany({
-      album_id: Number(albumId),
-    });
+    const tracks: Track[] = await Albums.tracks(Number(albumId));
 
     res.json(tracks);
   } catch (error) {

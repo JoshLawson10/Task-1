@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ---------- Database Init ----------
-import { db, database, initDatabase } from '../config/database';
+import { db, database, initDatabase } from '@config/database';
 
 initDatabase();
 app.locals.db = db;

@@ -1,68 +1,50 @@
-import { Track } from "@models/track";
-
 class MusicPlayer {
-  private audio: HTMLAudioElement;
-  private currentTrack: Track | null = null;
-  private isPlaying: boolean = false;
-  private volume: number = 0.5;
-
-  private songImage!: HTMLImageElement;
-  private songTitle!: HTMLElement;
-  private artistName!: HTMLElement;
-  private playBtn!: HTMLElement;
-  private likeBtn!: HTMLElement;
-  private currentTimeEl!: HTMLElement;
-  private totalTimeEl!: HTMLElement;
-  private progressBar!: HTMLInputElement;
-  private volumeSlider!: HTMLInputElement;
-  private shuffleBtn!: HTMLElement;
-  private repeatBtn!: HTMLElement;
-
   constructor() {
     this.audio = new Audio();
+    this.currentTrack = null;
+    this.isPlaying = false;
+    this.volume = 0.5;
     this.audio.volume = this.volume;
 
     this.initializeElements();
     this.attachEventListeners();
   }
 
-  private initializeElements(): void {
+  initializeElements() {
     const player = document.querySelector(".player");
     if (!player) return;
 
-    this.songImage = player.querySelector(".song-info img") as HTMLImageElement;
-    this.songTitle = player.querySelector(
-      ".song-info .details h4",
-    ) as HTMLElement;
-    this.artistName = player.querySelector(
-      ".song-info .details p",
-    ) as HTMLElement;
-    this.playBtn = player.querySelector(".fa-play")
-      ?.parentElement as HTMLElement;
-    this.likeBtn = player.querySelector(".like") as HTMLElement;
-    this.currentTimeEl = player.querySelector(".current-time") as HTMLElement;
-    this.totalTimeEl = player.querySelector(".total-time") as HTMLElement;
+    this.songImage = player.querySelector(".song-info img");
+    this.songTitle = player.querySelector(".song-info .details h4");
+    this.artistName = player.querySelector(".song-info .details p");
+    this.playBtn = player.querySelector(
+      ".controls .fa-play, .controls .fa-pause",
+    );
+    this.likeBtn = player.querySelector(".like");
+    this.currentTimeEl = player.querySelector(".current-time");
+    this.totalTimeEl = player.querySelector(".total-time");
     this.progressBar = player.querySelector(
       '.progress-bar input[type="range"]',
-    ) as HTMLInputElement;
-    this.volumeSlider = player.querySelector(
-      ".volume-slider",
-    ) as HTMLInputElement;
-    this.shuffleBtn = player.querySelector(".fa-shuffle")
-      ?.parentElement as HTMLElement;
-    this.repeatBtn = player.querySelector(".fa-repeat")
-      ?.parentElement as HTMLElement;
+    );
+    this.volumeSlider = player.querySelector(".volume-slider");
+    this.shuffleBtn = player.querySelector(".fa-shuffle");
+    this.repeatBtn = player.querySelector(".fa-repeat");
   }
 
-  private attachEventListeners(): void {
+  attachEventListeners() {
     this.audio.addEventListener("timeupdate", () => this.updateProgress());
     this.audio.addEventListener("loadedmetadata", () => this.updateDuration());
     this.audio.addEventListener("ended", () => this.onTrackEnd());
     this.audio.addEventListener("play", () => this.onPlay());
     this.audio.addEventListener("pause", () => this.onPause());
 
-    if (this.playBtn) {
-      this.playBtn.addEventListener("click", () => this.togglePlay());
+    const mainPlayButton = document.querySelector(".player .controls .buttons");
+    if (mainPlayButton) {
+      mainPlayButton.addEventListener("click", (e) => {
+        if (e.target.closest(".fa-play, .fa-pause")) {
+          this.togglePlay();
+        }
+      });
     }
 
     if (this.progressBar) {
@@ -74,8 +56,8 @@ class MusicPlayer {
       this.volumeSlider.addEventListener("input", (e) => this.setVolume(e));
     }
 
-    const prevBtn = document.querySelector(".fa-backward-step");
-    const nextBtn = document.querySelector(".fa-forward-step");
+    const prevBtn = document.querySelector(".player .fa-backward-step");
+    const nextBtn = document.querySelector(".player .fa-forward-step");
 
     if (prevBtn) prevBtn.addEventListener("click", () => this.previous());
     if (nextBtn) nextBtn.addEventListener("click", () => this.next());
@@ -92,10 +74,9 @@ class MusicPlayer {
     }
   }
 
-  async loadTrack(track: Track): Promise<void> {
+  async loadTrack(track) {
     this.currentTrack = track;
 
-    // Update UI
     if (this.songImage) {
       this.songImage.src = track.cover_image_url || "https://picsum.photos/60";
       this.songImage.alt = track.track_title;
@@ -104,7 +85,7 @@ class MusicPlayer {
     if (this.artistName)
       this.artistName.textContent = track.artist_name || "Unknown Artist";
 
-    // TODO: Replace with actual audio source
+    // TODO: Load actual audio file
     this.audio.src = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${(track.track_id % 16) + 1}.mp3`;
 
     if (track.duration_ms && this.totalTimeEl) {
@@ -114,7 +95,7 @@ class MusicPlayer {
     await this.incrementPlayCount(track.track_id);
   }
 
-  async play(track?: Track): Promise<void> {
+  async play(track) {
     if (track) {
       await this.loadTrack(track);
     }
@@ -128,13 +109,13 @@ class MusicPlayer {
     }
   }
 
-  pause(): void {
+  pause() {
     this.audio.pause();
     this.isPlaying = false;
     this.updatePlayButton();
   }
 
-  togglePlay(): void {
+  togglePlay() {
     if (this.isPlaying) {
       this.pause();
     } else {
@@ -144,25 +125,58 @@ class MusicPlayer {
     }
   }
 
-  private updatePlayButton(): void {
-    const icon = this.playBtn?.querySelector("i");
-    if (!icon) return;
-
-    if (this.isPlaying) {
-      icon.classList.remove("fa-play");
-      icon.classList.add("fa-pause");
-    } else {
-      icon.classList.remove("fa-pause");
-      icon.classList.add("fa-play");
+  updatePlayButton() {
+    const playerIcon = document.querySelector(
+      ".player .controls .buttons .fa-play, .player .controls .buttons .fa-pause",
+    );
+    if (playerIcon) {
+      if (this.isPlaying) {
+        playerIcon.classList.remove("fa-play");
+        playerIcon.classList.add("fa-pause");
+      } else {
+        playerIcon.classList.remove("fa-pause");
+        playerIcon.classList.add("fa-play");
+      }
     }
+
+    this.updateCardButtons();
   }
 
-  private updateProgress(): void {
+  updateCardButtons() {
+    document.querySelectorAll(".card .play-btn, .track").forEach((element) => {
+      const isCard = element.classList.contains("card");
+      const btn = isCard ? element.querySelector(".play-btn") : element;
+      const icon = btn?.querySelector("i.fa-play, i.fa-pause");
+
+      if (!icon) return;
+
+      let trackId;
+      if (isCard) {
+        trackId = parseInt(element.getAttribute("data-track-id"));
+      } else {
+        trackId = parseInt(element.getAttribute("data-track-id"));
+      }
+
+      const isCurrentTrack =
+        this.currentTrack && this.currentTrack.track_id === trackId;
+
+      if (isCurrentTrack && this.isPlaying) {
+        icon.classList.remove("fa-play");
+        icon.classList.add("fa-pause");
+      } else {
+        icon.classList.remove("fa-pause");
+        icon.classList.add("fa-play");
+      }
+    });
+  }
+
+  updateProgress() {
     if (!this.audio.duration) return;
 
     const progress = (this.audio.currentTime / this.audio.duration) * 100;
     if (this.progressBar) {
       this.progressBar.value = progress.toString();
+      this.progressBar.style.setProperty("--progress", `${progress}%`);
     }
 
     if (this.currentTimeEl) {
@@ -170,47 +184,53 @@ class MusicPlayer {
     }
   }
 
-  private updateDuration(): void {
+  updateDuration() {
     if (this.totalTimeEl && this.audio.duration) {
       this.totalTimeEl.textContent = this.formatTime(this.audio.duration);
     }
   }
 
-  private seekTo(e: Event): void {
-    const target = e.target as HTMLInputElement;
-    const seekTime = (parseFloat(target.value) / 100) * this.audio.duration;
+  seekTo(e) {
+    const seekTime = (parseFloat(e.target.value) / 100) * this.audio.duration;
     this.audio.currentTime = seekTime;
   }
 
-  private setVolume(e: Event): void {
-    const target = e.target as HTMLInputElement;
-    this.volume = parseFloat(target.value) / 100;
+  setVolume(e) {
+    this.volume = parseFloat(e.target.value) / 100;
     this.audio.volume = this.volume;
+    if (this.volumeSlider) {
+      this.volumeSlider.style.setProperty("--volume", `${this.volume * 100}%`);
+    }
   }
 
-  private formatTime(seconds: number): string {
+  formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   }
 
-  private onPlay(): void {
+  onPlay() {
     this.isPlaying = true;
     this.updatePlayButton();
+    this.updateCardButtons();
+    const player = document.querySelector(".player");
+    if (player) player.classList.add("playing");
   }
 
-  private onPause(): void {
+  onPause() {
+    this.isPlaying = false;
+    this.updatePlayButton();
+    this.updateCardButtons();
+    const player = document.querySelector(".player");
+    if (player) player.classList.remove("playing");
+  }
+
+  onTrackEnd() {
     this.isPlaying = false;
     this.updatePlayButton();
   }
 
-  private onTrackEnd(): void {
-    // ??? Could implement auto-play next track here
-    this.isPlaying = false;
-    this.updatePlayButton();
-  }
-
-  private async incrementPlayCount(trackId: number): Promise<void> {
+  async incrementPlayCount(trackId) {
     try {
       await fetch(`/api/tracks/${trackId}/play`, {
         method: "PUT",
@@ -220,52 +240,56 @@ class MusicPlayer {
     }
   }
 
-  private toggleLike(): void {
+  toggleLike() {
     const icon = this.likeBtn?.querySelector("i");
     if (!icon) return;
 
     if (icon.classList.contains("fa-regular")) {
       icon.classList.remove("fa-regular");
       icon.classList.add("fa-solid");
-      // TODO: Save to database
+      // TODO: Update Database
     } else {
       icon.classList.remove("fa-solid");
       icon.classList.add("fa-regular");
-      // TODO: Remove from database
+      // TODO: Update Database
     }
   }
 
-  private toggleShuffle(): void {
+  toggleShuffle() {
     if (!this.shuffleBtn) return;
     this.shuffleBtn.classList.toggle("active");
     // TODO: Implement shuffle logic
   }
 
-  private toggleRepeat(): void {
+  toggleRepeat() {
     if (!this.repeatBtn) return;
     this.repeatBtn.classList.toggle("active");
     // TODO: Implement repeat logic
   }
 
-  private previous(): void {
-    // TODO: Implement previous track logic
+  previous() {
     console.log("Previous track");
+    // TODO: Implement previous track logic
   }
 
-  private next(): void {
-    // TODO: Implement next track logic
+  next() {
     console.log("Next track");
+    // TODO: Implement next track logic
   }
 
-  getCurrentTrack(): Track | null {
+  getCurrentTrack() {
     return this.currentTrack;
   }
 
-  getIsPlaying(): boolean {
+  getIsPlaying() {
     return this.isPlaying;
   }
 }
 
-const musicPlayer = new MusicPlayer();
-
-(window as any).musicPlayer = musicPlayer;
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    window.musicPlayer = new MusicPlayer();
+  });
+} else {
+  window.musicPlayer = new MusicPlayer();
+}

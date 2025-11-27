@@ -34,7 +34,17 @@ router.get("/", async (req: Request, res: Response) => {
     Number(offset),
   );
 
-  res.json(albums);
+  const albumsExtra = [];
+
+  for (const album of albums) {
+    const artist = await Albums.artist(album.album_id);
+    albumsExtra.push({
+      ...album,
+      artist_name: artist ? artist.artist_name : null,
+    });
+  }
+
+  res.json(albumsExtra);
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
@@ -47,9 +57,9 @@ router.get("/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Album not found" });
     }
 
-    const artist: Artist | null = await Artists.findById(album.artist_id);
+    const artist: Artist | null = await Albums.artist(album.artist_id);
 
-    res.json({ ...album, artist });
+    res.json({ ...album, artist_name: artist ? artist.artist_name : null });
   } catch (error) {
     console.error("Error fetching album:", error);
     res.status(500).json({ error: "Internal server error" });

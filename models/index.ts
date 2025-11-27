@@ -59,6 +59,13 @@ export const Albums = extendModel(AlbumsModel, {
     return TracksModel.findMany({ album_id: albumId });
   },
 
+  async artist(albumId: number): Promise<Artist | null> {
+    const album = await AlbumsModel.findById(albumId);
+    if (!album) return null;
+
+    return ArtistsModel.findById(album.artist_id);
+  },
+
   async withTracks(album_id: number) {
     const album = await AlbumsModel.findUnique({ album_id });
     if (!album) return null;

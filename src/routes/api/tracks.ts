@@ -40,7 +40,21 @@ router.get("/popular", async (req: Request, res: Response) => {
 
     const tracks: Track[] = await Tracks.popular(Number(limit));
 
-    res.json(tracks);
+    const tracksExtra = [];
+
+    for (const track of tracks) {
+      const album = await Tracks.album(track.track_id);
+      const artist = await Tracks.artist(track.track_id);
+      const cover_image_url = await Tracks.cover_image_url(track.track_id);
+      tracksExtra.push({
+        ...track,
+        album_name: album ? album.album_title : null,
+        artist_name: artist ? artist.artist_name : null,
+        cover_image_url: cover_image_url ? cover_image_url : null,
+      });
+    }
+
+    res.json(tracksExtra);
   } catch (error) {
     console.error("Error fetching popular tracks:", error);
     res.status(500).json({ error: "Internal server error" });

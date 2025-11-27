@@ -13,7 +13,8 @@
       "@config/*": ["../config/*"],
       "@lib/*": ["../lib/*"],
       "@models/*": ["../models/*"]
-    }
+    },
+    "lib": ["ES2022", "dom"]
   },
   "include": ["**/*.ts"],
   "exclude": ["dist"]

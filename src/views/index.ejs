@@ -2,9 +2,11 @@
     <%- include('./partials/sidebar') %>
         <main class="main">
             <%- include('./partials/header') %>
-                <div class="content" id="app-content">
-                    <%- include(content) %>
-                </div>
+                <turbo-frame id="app-content">
+                    <div class="content">
+                        <%- include(content) %>
+                    </div>
+                </turbo-frame>
         </main>
         <%- include('./partials/footer') %>
 </div>

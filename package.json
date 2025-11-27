@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hotwired/turbo": "^8.0.20",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "ejs": "^3.1.10",

@@ -8,35 +8,38 @@ import usersRouter from "./api/users";
 
 export const register = (app: express.Application) => {
   app.get("/", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/home" });
+    res.render("index", { pageTitle: "Music App", content: "pages/home" });
   });
 
   app.get("/explore", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/explore" });
+    res.render("index", { pageTitle: "Music App", content: "pages/explore" });
   });
 
   app.get("/songs", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/songs" });
+    res.render("index", { pageTitle: "Music App", content: "pages/songs" });
   });
 
   app.get("/artists", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/artists" });
+    res.render("index", { pageTitle: "Music App", content: "pages/artists" });
   });
 
   app.get("/albums", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/albums" });
+    res.render("index", { pageTitle: "Music App", content: "pages/albums" });
   });
 
   app.get("/playlists", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/playlists" });
+    res.render("index", { pageTitle: "Music App", content: "pages/playlists" });
   });
 
   app.get("/liked", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/liked" });
+    res.render("index", { pageTitle: "Music App", content: "pages/liked" });
   });
 
   app.get("/episodes", (req, res) => {
-    res.render("index", { title: "Music App", content: "pages/episodes" });
+    res.render("index", {
+      pageTitle: "Music App",
+      content: "pages/episodes",
+    });
   });
 
   app.use("/api/albums", albumsRouter);

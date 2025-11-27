@@ -14,8 +14,8 @@
       "@lib/*": ["../lib/*"],
       "@models/*": ["../models/*"]
     },
-    "lib": ["ES2022", "dom"]
+    "lib": ["ES2022", "DOM"]
   },
-  "include": ["**/*.ts"],
-  "exclude": ["dist"]
+  "include": ["**/*.ts", "src/public/js/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -15,10 +15,16 @@
         padding: var(--spacing-sm) var(--spacing-md);
         border: 1px solid transparent;
         transition: all var(--transition-base);
+        cursor: pointer;
     }
 
     .track:hover {
         background: rgba(29, 185, 84, 0.05);
+        border-color: var(--color-accent);
+    }
+
+    .track.playing {
+        background: rgba(29, 185, 84, 0.1);
         border-color: var(--color-accent);
     }
 
@@ -48,26 +54,75 @@
         font-size: var(--font-size-sm);
         color: var(--color-text-secondary);
     }
+
+    .track .play-icon {
+        color: var(--color-accent);
+        font-size: 24px;
+        margin-right: var(--spacing-md);
+        opacity: 0;
+        transition: opacity var(--transition-base);
+    }
+
+    .track:hover .play-icon,
+    .track.playing .play-icon {
+        opacity: 1;
+    }
+
+    .track .duration {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        margin-right: var(--spacing-md);
+    }
 </style>
 
 <h1>All Songs</h1>
 <div class="track-list" id="track-list"></div>
 
 <script type="module">
-    const response = await Promise.resolve(fetch("/api/tracks?limit=10"));
+    function formatDuration(ms) {
+        if (!ms) return '0:00';
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    const response = await fetch("/api/tracks?limit=50");
     const tracks = await response.json();
 
     const trackList = document.getElementById("track-list");
+
     tracks.forEach(track => {
         const trackElement = document.createElement("div");
         trackElement.classList.add("track");
+        trackElement.setAttribute('data-track-id', track.track_id);
         trackElement.innerHTML = `
             <img src="${track.cover_image_url || "https://picsum.photos/60"}" alt="${track.track_title}">
             <div class="info">
                 <h4>${track.track_title}</h4>
-                <p>${track.artist_name} - ${track.album_name}</p>
+                <p>${track.artist_name || 'Unknown Artist'} - ${track.album_name || 'Unknown Album'}</p>
             </div>
+            <span class="duration">${formatDuration(track.duration_ms)}</span>
+            <i class="fa-solid fa-play play-icon"></i>
         `;
+
+        // Add click handler to play track
+        trackElement.addEventListener('click', async () => {
+            if (window.musicPlayer) {
+                // Check if this track is currently playing
+                const currentTrack = window.musicPlayer.getCurrentTrack();
+                const isPlaying = window.musicPlayer.getIsPlaying();
+
+                if (currentTrack && currentTrack.track_id === track.track_id) {
+                    // Toggle play/pause for current track
+                    window.musicPlayer.togglePlay();
+                } else {
+                    // Play new track
+                    await window.musicPlayer.play(track);
+                }
+            }
+        });
+
         trackList.appendChild(trackElement);
     });
 </script>

@@ -45,6 +45,16 @@
   --transition-base: 250ms ease;
 }
 
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 /* --- Global Styles --- */
 *,
 *::before,
@@ -256,8 +266,21 @@ h2 {
   width: 56px;
   height: 56px;
   border-radius: var(--border-radius);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-secondary),
+    var(--color-bg-surface)
+  );
+  border: 1px solid var(--color-accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.song-info img[src=""] {
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-secondary),
+    var(--color-bg-surface)
+  );
 }
 
 .song-info .details h4 {
@@ -279,6 +302,10 @@ h2 {
   transition: all var(--transition-base);
   font-size: 18px;
   padding: var(--spacing-sm);
+}
+
+.like i.fa-solid {
+  color: var(--color-accent);
 }
 
 .like:hover {
@@ -304,13 +331,24 @@ h2 {
   font-size: 20px;
   cursor: pointer;
   color: var(--color-text-primary);
-  transition: all var(--transition-base);
+  transition: all var(--transition-fast);
   padding: var(--spacing-xs);
 }
 
-.buttons i.fa-play {
-  font-size: 28px;
-  color: var(--color-accent);
+.buttons i:active {
+  transform: scale(0.95);
+}
+
+.buttons .fa-play,
+.buttons .fa-pause {
+  font-size: 32px !important;
+  color: var(--color-accent) !important;
+  filter: drop-shadow(0 0 8px rgba(29, 185, 84, 0.4));
+}
+
+.buttons .fa-play:hover,
+.buttons .fa-pause:hover {
+  filter: drop-shadow(0 0 12px rgba(29, 185, 84, 0.6));
 }
 
 .buttons i.fa-shuffle,
@@ -321,6 +359,10 @@ h2 {
 .buttons i:hover {
   color: var(--color-accent);
   transform: scale(1.1);
+}
+
+.buttons i.active {
+  color: var(--color-accent) !important;
 }
 
 .progress-bar {
@@ -341,7 +383,13 @@ h2 {
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
-  background: var(--color-border);
+  background: linear-gradient(
+    to right,
+    var(--color-accent) 0%,
+    var(--color-accent) var(--progress, 0%),
+    var(--color-border) var(--progress, 0%),
+    var(--color-border) 100%
+  );
   border-radius: 999px;
   outline: none;
   cursor: pointer;
@@ -391,7 +439,13 @@ h2 {
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
-  background: var(--color-border);
+  background: linear-gradient(
+    to right,
+    var(--color-accent) 0%,
+    var(--color-accent) var(--volume, 50%),
+    var(--color-border) var(--volume, 50%),
+    var(--color-border) 100%
+  );
   border-radius: 999px;
   outline: none;
   cursor: pointer;

@@ -1,15 +1,15 @@
-import express from 'express';
-import expressEjsLayouts from 'express-ejs-layouts';
+import express from "express";
+import expressEjsLayouts from "express-ejs-layouts";
 import cookieParser from "cookie-parser";
-import path from 'path';
+import path from "path";
 import logger from "morgan";
-import * as routes from "./routes/index"
+import * as routes from "./routes/index";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // ---------- Database Init ----------
-import { db, database, initDatabase } from '@config/database';
+import { db, database, initDatabase } from "@config/database";
 
 initDatabase();
 app.locals.db = db;
@@ -30,38 +30,47 @@ app.use((req, res, next) => {
 });
 
 // ---------- Middleware & View Engine ----------
-app.set('port', port);
+app.set("port", port);
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use(expressEjsLayouts)
-app.set('layout','layouts/layout');
+app.use(expressEjsLayouts);
+app.set("layout", "layouts/layout");
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // ---------- Routes ----------
-routes.register(app)
+routes.register(app);
 
 // ---------- Errors and 404 Handling ----------
 app.use((req, res, next) => {
-  const err = new Error('Not Found');
+  const err = new Error("Not Found");
   (err as any).status = 404;
   next(err);
 });
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  res.status(err.status || 500);
-  res.render('error');
-});
+    console.log(err.message);
+
+    res.status(err.status || 500);
+    res.render("error");
+  },
+);
 
 // ---------- Server Setup ----------
 app.listen(port, () => {

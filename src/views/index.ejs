@@ -1,4 +1,12 @@
-<h1>Home Page</h1>
-<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minima vero totam nemo, debitis nostrum officia odit
-    commodi fugiat enim modi explicabo eveniet perspiciatis blanditiis ipsum! Impedit soluta quis excepturi alias.
-</p>
+<div class="app">
+    <%- include('./partials/sidebar') %>
+        <main class="main">
+            <%- include('./partials/header') %>
+                <turbo-frame id="app-content">
+                    <div class="content">
+                        <%- include(content) %>
+                    </div>
+                </turbo-frame>
+        </main>
+        <%- include('./partials/footer') %>
+</div>

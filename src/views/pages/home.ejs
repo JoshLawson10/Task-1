@@ -1,0 +1,184 @@
+<style>
+    .greeting {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .greeting h1 {
+        background: linear-gradient(135deg, var(--green-300), var(--green-500));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .greeting p {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-lg);
+    }
+</style>
+
+<div class="greeting">
+    <h1 id="greeting-message">Welcome Back, User</h1>
+    <p>Here's what's new for you today.</p>
+</div>
+
+<section class="card-track" id="popular-tracks">
+    <div class="header">
+        <h2>Popular Right Now</h2>
+        <a href="/songs" data-link> View All Songs </a>
+    </div>
+    <div class="cards"></div>
+</section>
+
+<section class="card-track" id="recent-tracks">
+    <div class="header">
+        <h2>Recently Added</h2>
+        <a href="/songs" data-link> View All </a>
+    </div>
+    <div class="cards"></div>
+</section>
+
+<section class="card-track" id="new-albums">
+    <div class="header">
+        <h2>New Albums</h2>
+        <a href="/albums" data-link> View All Albums </a>
+    </div>
+    <div class="cards"></div>
+</section>
+
+<section class="card-track" id="featured-artists">
+    <div class="header">
+        <h2>Featured Artists</h2>
+        <a href="/artists" data-link> View All Artists </a>
+    </div>
+    <div class="cards"></div>
+</section>
+
+<script type="module">
+    function getGreeting() {
+        const now = new Date();
+        const hours = now.getHours();
+        if (hours < 12) {
+            return "Good Morning, User";
+        } else if (hours < 18) {
+            return "Good Afternoon, User";
+        } else {
+            return "Good Evening, User";
+        }
+    }
+
+    function generateTrackCard(track) {
+        return `
+        <div class="card" data-track-id="${track.track_id}">
+        <img src="${track.cover_image_url || "https://picsum.photos/200"
+            }" alt="${track.track_title}">
+        <div class="content">
+            <div class="text">
+            <h3>${track.track_title}</h3>
+            <p>${track.artist_name || "Unknown Artist"}</p>
+            </div>
+            <button class="play-btn" aria-label="Play ${track.track_title}">
+            <i class="fa-solid fa-play"></i>
+            </button>
+        </div>
+        </div>
+    `;
+    }
+
+    function generateAlbumCard(album) {
+        return `
+    <div class="card" data-album-id="${album.album_id}">
+      <img src="${album.cover_image_url || "https://picsum.photos/200"
+            }" alt="${album.album_title}">
+      <div class="content">
+        <div class="text">
+          <h3>${album.album_title}</h3>
+          <p>${album.artist_name || "Unknown Artist"}${album.release_year ? " • " + album.release_year : ""
+            }</p>
+        </div>
+        <button class="play-btn" aria-label="Play ${album.album_title}">
+          <i class="fa-solid fa-play"></i>
+        </button>
+      </div>
+    </div>
+  `;
+    }
+
+    function generateArtistCard(artist) {
+        return `
+    <div class="card" data-artist-id="${artist.artist_id}">
+      <img src="${artist.profile_image_url || "https://picsum.photos/200"
+            }" alt="${artist.artist_name}" style="object-fit: cover;">
+      <div class="content">
+        <div class="text">
+          <h3>${artist.artist_name}</h3>
+          <p>Artist</p>
+        </div>
+        <button class="play-btn" aria-label="Play ${artist.artist_name}">
+          <i class="fa-solid fa-play"></i>
+        </button>
+      </div>
+    </div>
+  `;
+    }
+
+    console.log("Setting greeting message...");
+
+    document.getElementById("greeting-message").textContent = getGreeting();
+
+    console.log("Fetching home page data...");
+
+    const [tracksResponse, popularResponse, albumsResponse, artistsResponse] =
+        await Promise.all([
+            fetch("/api/tracks?limit=10"),
+            fetch("/api/tracks/popular?limit=10"),
+            fetch("/api/albums?limit=6"),
+            fetch("/api/artists?limit=6"),
+        ]);
+
+    if (!tracksResponse.ok) {
+        throw new Error(`HTTP error! status: ${tracksResponse.status}`);
+        console.error("Failed to fetch tracks data.");
+    } else {
+        console.log("Tracks data fetched successfully.");
+    }
+
+    const recentTracks = await tracksResponse.json();
+    const popularTracks = popularResponse.ok ? await popularResponse.json() : [];
+    const albums = albumsResponse.ok ? await albumsResponse.json() : [];
+    const artists = artistsResponse.ok ? await artistsResponse.json() : [];
+
+    console.log(recentTracks, popularTracks, albums, artists);
+
+    const recentTracksContainer = document
+        .getElementById("recent-tracks")
+        .querySelector(".cards");
+
+    recentTracks.forEach((track) => {
+        recentTracksContainer.innerHTML += generateTrackCard(track);
+    });
+
+    const popularTracksContainer = document
+        .getElementById("popular-tracks")
+        .querySelector(".cards");
+
+    popularTracks.forEach((track) => {
+        popularTracksContainer.innerHTML += generateTrackCard(track);
+    });
+
+    const albumsContainer = document
+        .getElementById("new-albums")
+        .querySelector(".cards");
+
+    albums.forEach((album) => {
+        albumsContainer.innerHTML += generateAlbumCard(album);
+    });
+
+    const artistsContainer = document
+        .getElementById("featured-artists")
+        .querySelector(".cards");
+
+    artists.forEach((artist) => {
+        artistsContainer.innerHTML += generateArtistCard(artist);
+    });
+
+</script>

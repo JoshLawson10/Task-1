@@ -4,7 +4,16 @@
 <%- include('../partials/head') %>
 
     <body>
-        <%- include('../index') %>
+        <div class="app">
+            <%- include('../partials/sidebar') %>
+                <main class="main">
+                    <%- include('../partials/header') %>
+                        <div class="content" id="app-content">
+                            <%- include('../index') %>
+                        </div>
+                </main>
+                <%- include('../partials/footer') %>
+        </div>
     </body>
 
 </html>

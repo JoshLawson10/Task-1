@@ -78,6 +78,13 @@ export const Tracks = extendModel(TracksModel, {
       { play_count: track.play_count + 1 },
     );
   },
+
+  async popular(limit: number) {
+    const tracks: Track[] = await TracksModel.findMany();
+
+    tracks.sort((a, b) => b.play_count - a.play_count);
+    return tracks.slice(0, limit);
+  },
 });
 
 export const Playlists = extendModel(PlaylistsModel, {

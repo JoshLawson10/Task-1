@@ -69,6 +69,29 @@ export const Albums = extendModel(AlbumsModel, {
 });
 
 export const Tracks = extendModel(TracksModel, {
+  async album(track_id: number) {
+    const track = await TracksModel.findUnique({ track_id });
+    if (!track) return null;
+
+    const album = await AlbumsModel.findUnique({ album_id: track.album_id });
+    return album;
+  },
+
+  async artist(track_id: number) {
+    const album = await Tracks.album(track_id);
+    if (!album) return null;
+
+    const artist = await ArtistsModel.findUnique({
+      artist_id: album.artist_id,
+    });
+    return artist;
+  },
+
+  async cover_image_url(track_id: number) {
+    const album = await Tracks.album(track_id);
+    return album ? album.cover_image_url : null;
+  },
+
   async play(track_id: number) {
     const track = await TracksModel.findUnique({ track_id });
     if (!track) throw new Error("Track not found");

@@ -2,14 +2,17 @@ import sqlite3, { Database as SQLiteDatabase, RunResult } from "sqlite3";
 import { promisify } from "util";
 import bcrypt from "bcrypt";
 
-const database: SQLiteDatabase = new sqlite3.Database("./.database/music.db", (err) => {
+const database: SQLiteDatabase = new sqlite3.Database(
+  "./.database/music.db",
+  (err) => {
     if (err) {
-        console.error("Could not connect to database", err);
+      console.error("Could not connect to database", err);
     } else {
-        console.log("Connected to SQLite database");
-        initDatabase();
+      console.log("Connected to SQLite database");
+      initDatabase();
     }
-});
+  },
+);
 
 const db = {
   get: promisify(database.get.bind(database)) as <T = any>(
@@ -22,13 +25,16 @@ const db = {
     ...params: any[]
   ) => Promise<T[]>,
 
-  run: promisify(database.run.bind(database)) as (
-    sql: string,
-    ...params: any[]
-  ) => Promise<RunResult>,
+  run: (sql: string, ...params: any[]) =>
+    new Promise<RunResult>((resolve, reject) => {
+      database.run(sql, ...params, function (this: RunResult, err: any) {
+        if (err) return reject(err);
+        resolve(this);
+      });
+    }),
 
   exec: promisify(database.exec.bind(database)) as (
-    sql: string
+    sql: string,
   ) => Promise<void>,
 };
 
@@ -110,6 +116,17 @@ async function initDatabase(): Promise<void> {
     `);
 
     await db.exec(`
+      CREATE TABLE IF NOT EXISTS liked_tracks (
+        user_id INTEGER NOT NULL,
+        track_id INTEGER NOT NULL,
+        liked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, track_id),
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+        FOREIGN KEY (track_id) REFERENCES tracks(track_id) ON DELETE CASCADE
+      );
+    `);
+
+    await db.exec(`
       CREATE INDEX IF NOT EXISTS idx_tracks_album ON tracks(album_id);
       CREATE INDEX IF NOT EXISTS idx_playlists_user ON playlists(user_id);
       CREATE INDEX IF NOT EXISTS idx_username ON users(username);
@@ -119,6 +136,8 @@ async function initDatabase(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_track_title ON tracks(track_title);
       CREATE INDEX IF NOT EXISTS idx_play_count ON tracks(play_count);
       CREATE INDEX IF NOT EXISTS idx_public ON playlists(is_public);
+      CREATE INDEX IF NOT EXISTS idx_liked_tracks_user ON liked_tracks(user_id);
+      CREATE INDEX IF NOT EXISTS idx_liked_tracks_track ON liked_tracks(track_id);
     `);
 
     await seedDatabase();
@@ -148,7 +167,7 @@ async function seedDatabase(): Promise<void> {
         ('sarahm', 'sarah@example.com', ?, 'Sarah Mitchell', 'https://i.pravatar.cc/150?img=3'),
         ('alexj', 'alex@example.com', ?, 'Alex Johnson', 'https://i.pravatar.cc/150?img=4')
     `,
-      [hashedPassword, hashedPassword, hashedPassword, hashedPassword]
+      [hashedPassword, hashedPassword, hashedPassword, hashedPassword],
     );
 
     await db.run(`

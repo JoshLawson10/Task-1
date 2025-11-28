@@ -6,6 +6,7 @@ import type { Album } from "./album";
 import type { Track } from "./track";
 import type { Playlist } from "./playlist";
 import type { PlaylistTrack } from "./playlistTrack";
+import type { LikedTrack } from "./likedTrack";
 
 const UsersModel = new BaseModel<User>("users", "user_id");
 const ArtistsModel = new BaseModel<Artist>("artists", "artist_id");
@@ -13,6 +14,7 @@ const AlbumsModel = new BaseModel<Album>("albums", "album_id");
 const TracksModel = new BaseModel<Track>("tracks", "track_id");
 const PlaylistsModel = new BaseModel<Playlist>("playlists", "playlist_id");
 const PlaylistTracksModel = new BaseModel<PlaylistTrack>("playlist_tracks", "");
+const LikedTracksModel = new BaseModel<LikedTrack>("liked_tracks", "track_id");
 
 function extendModel<
   T extends Record<string, any>,
@@ -37,6 +39,53 @@ function extendModel<
 export const Users = extendModel(UsersModel, {
   playlists(userId: number): Promise<Playlist[]> {
     return PlaylistsModel.findMany({ user_id: userId } as Partial<Playlist>);
+  },
+
+  async likedTracks(userId: number): Promise<Track[]> {
+    const likedTracks: LikedTrack[] = await LikedTracksModel.findMany({
+      user_id: Number(userId),
+    } as Partial<LikedTrack>);
+
+    const trackIds: number[] = likedTracks.map((lt) => Number(lt.track_id));
+
+    const tracks = (
+      await Promise.all(trackIds.map((id) => Tracks.findById(id)))
+    ).filter((t): t is Track => Boolean(t));
+
+    return tracks;
+  },
+
+  async isTrackLiked(userId: number, trackId: number): Promise<boolean> {
+    const likedTrack = await LikedTracksModel.findUnique({
+      user_id: userId,
+      track_id: trackId,
+    } as Partial<LikedTrack>);
+    return Boolean(likedTrack);
+  },
+
+  async likeTrack(userId: number, trackId: number): Promise<LikedTrack | null> {
+    const alreadyLiked = await this.isTrackLiked(userId, trackId);
+    if (alreadyLiked) return null;
+
+    return LikedTracksModel.create({
+      user_id: userId,
+      track_id: trackId,
+      liked_at: new Date().toISOString(),
+    } as Partial<LikedTrack>);
+  },
+
+  async unlikeTrack(userId: number, trackId: number): Promise<boolean> {
+    const likedTrack = await LikedTracksModel.findUnique({
+      user_id: userId,
+      track_id: trackId,
+    } as Partial<LikedTrack>);
+    if (!likedTrack) return false;
+
+    await LikedTracksModel.delete({
+      user_id: userId,
+      track_id: trackId,
+    } as Partial<LikedTrack>);
+    return true;
   },
 });
 
@@ -178,14 +227,13 @@ export const Tracks = extendModel(TracksModel, {
     return album ? album.cover_image_url : null;
   },
 
-  async play(track_id: number) {
-    const track = await TracksModel.findUnique({ track_id } as Partial<Track>);
+  async play(track_id: number): Promise<void> {
+    const track = await TracksModel.findById(track_id);
     if (!track) throw new Error("Track not found");
 
-    await TracksModel.update(
-      { track_id } as Partial<Track>,
-      { play_count: track.play_count + 1 } as Partial<Track>,
-    );
+    await TracksModel.update({ track_id }, {
+      play_count: track.play_count + 1,
+    } as Partial<Track>);
   },
 
   async popular(limit: number): Promise<Track[]> {
@@ -314,4 +362,6 @@ export const Playlists = extendModel(PlaylistsModel, {
 
 export const PlaylistTracks = extendModel(PlaylistTracksModel, {});
 
-export { User, Artist, Album, Track, Playlist, PlaylistTrack };
+export const LikedTracks = extendModel(LikedTracksModel, {});
+
+export { User, Artist, Album, Track, Playlist, PlaylistTrack, LikedTrack };

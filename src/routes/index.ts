@@ -5,6 +5,7 @@ import artistsRouter from "./api/artists";
 import playlistsRouter from "./api/playlists";
 import tracksRouter from "./api/tracks";
 import usersRouter from "./api/users";
+import likesRouter from "./api/likes";
 
 export const register = (app: express.Application) => {
   app.get("/", (req, res) => {
@@ -47,4 +48,5 @@ export const register = (app: express.Application) => {
   app.use("/api/playlists", playlistsRouter);
   app.use("/api/tracks", tracksRouter);
   app.use("/api/users", usersRouter);
+  app.use("/api/likes", likesRouter);
 };

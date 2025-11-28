@@ -5,6 +5,7 @@ class MusicPlayer {
     this.isPlaying = false;
     this.volume = 0.5;
     this.audio.volume = this.volume;
+    this.currentUserId = 1; // TODO: Get from session/auth
 
     this.initializeElements();
     this.attachEventListeners();
@@ -91,6 +92,8 @@ class MusicPlayer {
     if (track.duration_ms && this.totalTimeEl) {
       this.totalTimeEl.textContent = this.formatTime(track.duration_ms / 1000);
     }
+
+    await this.updateLikeButton();
 
     await this.incrementPlayCount(track.track_id);
   }
@@ -240,18 +243,68 @@ class MusicPlayer {
     }
   }
 
-  toggleLike() {
+  async toggleLike() {
+    if (!this.currentTrack) return;
+
     const icon = this.likeBtn?.querySelector("i");
     if (!icon) return;
 
-    if (icon.classList.contains("fa-regular")) {
-      icon.classList.remove("fa-regular");
-      icon.classList.add("fa-solid");
-      // TODO: Update Database
-    } else {
-      icon.classList.remove("fa-solid");
-      icon.classList.add("fa-regular");
-      // TODO: Update Database
+    const isLiked = icon.classList.contains("fa-solid");
+    const trackId = this.currentTrack.track_id;
+
+    try {
+      if (isLiked) {
+        const response = await fetch(
+          `/api/likes/user/${this.currentUserId}/track/${trackId}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (response.ok) {
+          icon.classList.remove("fa-solid");
+          icon.classList.add("fa-regular");
+        }
+      } else {
+        const response = await fetch(
+          `/api/likes/user/${this.currentUserId}/track/${trackId}`,
+          {
+            method: "POST",
+          },
+        );
+
+        if (response.ok) {
+          icon.classList.remove("fa-regular");
+          icon.classList.add("fa-solid");
+        }
+      }
+      updateLikeButton();
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
+  }
+
+  async updateLikeButton() {
+    if (!this.currentTrack || !this.likeBtn) return;
+
+    const icon = this.likeBtn.querySelector("i");
+    if (!icon) return;
+
+    try {
+      const response = await fetch(
+        `/api/likes/user/${this.currentUserId}/track/${this.currentTrack.track_id}`,
+      );
+      const data = await response.json();
+
+      if (data.isLiked) {
+        icon.classList.remove("fa-regular");
+        icon.classList.add("fa-solid");
+      } else {
+        icon.classList.remove("fa-solid");
+        icon.classList.add("fa-regular");
+      }
+    } catch (error) {
+      console.error("Error checking like status:", error);
     }
   }
 

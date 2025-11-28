@@ -24,7 +24,7 @@
 <section class="card-track" id="popular-tracks">
     <div class="header">
         <h2>Popular Right Now</h2>
-        <a href="/songs" data-link> View All Songs </a>
+        <a href="/songs" data-turbo-frame="app-content"> View All Songs </a>
     </div>
     <div class="cards"></div>
 </section>
@@ -32,7 +32,7 @@
 <section class="card-track" id="recent-tracks">
     <div class="header">
         <h2>Recently Added</h2>
-        <a href="/songs" data-link> View All </a>
+        <a href="/songs" data-turbo-frame="app-content"> View All </a>
     </div>
     <div class="cards"></div>
 </section>
@@ -40,7 +40,7 @@
 <section class="card-track" id="new-albums">
     <div class="header">
         <h2>New Albums</h2>
-        <a href="/albums" data-link> View All Albums </a>
+        <a href="/albums" data-turbo-frame="app-content"> View All Albums </a>
     </div>
     <div class="cards"></div>
 </section>
@@ -48,7 +48,7 @@
 <section class="card-track" id="featured-artists">
     <div class="header">
         <h2>Featured Artists</h2>
-        <a href="/artists" data-link> View All Artists </a>
+        <a href="/artists" data-turbo-frame="app-content"> View All Artists </a>
     </div>
     <div class="cards"></div>
 </section>
@@ -76,7 +76,7 @@
             <h3>${track.track_title}</h3>
             <p>${track.artist_name || "Unknown Artist"}</p>
             </div>
-            <button class="play-btn" aria-label="Play ${track.track_title}">
+            <button class="play-btn" data-track='${JSON.stringify(track)}' aria-label="Play ${track.track_title}">
             <i class="fa-solid fa-play"></i>
             </button>
         </div>
@@ -119,6 +119,19 @@
       </div>
     </div>
   `;
+    }
+
+    function attachPlayHandlers() {
+        document.querySelectorAll('.play-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const trackData = btn.getAttribute('data-track');
+                if (trackData && window.musicPlayer) {
+                    const track = JSON.parse(trackData);
+                    await window.musicPlayer.play(track);
+                }
+            });
+        });
     }
 
     console.log("Setting greeting message...");
@@ -180,5 +193,7 @@
     artists.forEach((artist) => {
         artistsContainer.innerHTML += generateArtistCard(artist);
     });
+
+    attachPlayHandlers();
 
 </script>

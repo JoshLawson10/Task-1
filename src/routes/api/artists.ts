@@ -4,18 +4,18 @@ import { Album, Artist, Artists } from "@models/index";
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const { name } = req.body;
+  const { artist_name } = req.body;
 
-  if (!name) {
+  if (!artist_name) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
     const newArtist = await Artists.create({
-      data: {
-        ...req.body,
-        created_at: new Date(),
-      },
+      artist_name,
+      bio: req.body.bio,
+      profile_image_url: req.body.profile_image_url,
+      created_at: new Date().toISOString(),
     });
 
     res.status(201).json(newArtist);

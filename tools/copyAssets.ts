@@ -1,6 +1,14 @@
 import * as shell from "shelljs";
-// Copy all the view templates and assets in the public folder
-shell.cp("-R", ["src/views", "src/public"], "dist/");
 
-// Remove unnecessary files
-shell.rm(["dist/public/js/*.ts", "dist/public/js/*.json"]);
+shell.mkdir("-p", "dist/public/js");
+shell.mkdir("-p", "dist/public/css");
+
+shell.cp("-R", "src/views", "dist/");
+
+shell.cp("-R", "src/public/css", "dist/public/");
+shell.cp("-R", "src/public/js", "dist/public/");
+
+shell.rm("-f", "dist/public/js/*.ts");
+shell.rm("-f", "dist/public/js/*.json");
+
+console.log("✓ Assets copied successfully");

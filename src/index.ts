@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(expressEjsLayouts);
-app.set("layout", "layouts/layout");
+app.set("layout", "layouts/app");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));

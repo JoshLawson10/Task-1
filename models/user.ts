@@ -5,5 +5,10 @@ export interface User {
   password_hash: string;
   display_name?: string;
   profile_image_url?: string;
+  email_verified: boolean;
+  google_id?: string;
+  microsoft_id?: string;
+  auth_provider: "local" | "google" | "microsoft";
   created_at: string;
+  updated_at: string;
 }

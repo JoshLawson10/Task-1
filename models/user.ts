@@ -8,7 +8,7 @@ export interface User {
   email_verified: boolean;
   google_id?: string;
   microsoft_id?: string;
-  auth_provider: "local" | "google" | "microsoft";
+  auth_provider: "local" | "google" | "microsoft" | "magic_link";
   created_at: string;
   updated_at: string;
 }

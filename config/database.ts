@@ -43,12 +43,53 @@ async function initDatabase(): Promise<void> {
     await db.exec(`
       CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
+        username TEXT UNIQUE,
         email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
+        password_hash TEXT,
         display_name TEXT,
         profile_image_url TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        email_verified BOOLEAN DEFAULT FALSE,
+        google_id TEXT UNIQUE,
+        microsoft_id TEXT UNIQUE,
+        auth_provider TEXT DEFAULT 'local',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS magic_link_tokens (
+        token_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        token TEXT NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        used BOOLEAN DEFAULT FALSE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS email_verification_tokens (
+        token_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        token TEXT NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        used BOOLEAN DEFAULT FALSE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        token_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        token TEXT NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        used BOOLEAN DEFAULT FALSE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
       );
     `);
 
@@ -130,6 +171,9 @@ async function initDatabase(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_tracks_album ON tracks(album_id);
       CREATE INDEX IF NOT EXISTS idx_playlists_user ON playlists(user_id);
       CREATE INDEX IF NOT EXISTS idx_username ON users(username);
+      CREATE INDEX IF NOT EXISTS idx_email ON users(email);
+      CREATE INDEX IF NOT EXISTS idx_google_id ON users(google_id);
+      CREATE INDEX IF NOT EXISTS idx_microsoft_id ON users(microsoft_id);
       CREATE INDEX IF NOT EXISTS idx_artist_name ON artists(artist_name);
       CREATE INDEX IF NOT EXISTS idx_albums_artist ON albums(artist_id);
       CREATE INDEX IF NOT EXISTS idx_album_title ON albums(album_title);
@@ -138,6 +182,9 @@ async function initDatabase(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_public ON playlists(is_public);
       CREATE INDEX IF NOT EXISTS idx_liked_tracks_user ON liked_tracks(user_id);
       CREATE INDEX IF NOT EXISTS idx_liked_tracks_track ON liked_tracks(track_id);
+      CREATE INDEX IF NOT EXISTS idx_magic_link_token ON magic_link_tokens(token);
+      CREATE INDEX IF NOT EXISTS idx_verification_token ON email_verification_tokens(token);
+      CREATE INDEX IF NOT EXISTS idx_reset_token ON password_reset_tokens(token);
     `);
 
     await seedDatabase();
@@ -160,12 +207,12 @@ async function seedDatabase(): Promise<void> {
 
     await db.run(
       `
-      INSERT INTO users (username, email, password_hash, display_name, profile_image_url)
+      INSERT INTO users (username, email, password_hash, display_name, profile_image_url, email_verified, auth_provider)
       VALUES 
-        ('musiclover', 'music@example.com', ?, 'Music Lover', 'https://i.pravatar.cc/150?img=1'),
-        ('jdoe', 'john@example.com', ?, 'John Doe', 'https://i.pravatar.cc/150?img=2'),
-        ('sarahm', 'sarah@example.com', ?, 'Sarah Mitchell', 'https://i.pravatar.cc/150?img=3'),
-        ('alexj', 'alex@example.com', ?, 'Alex Johnson', 'https://i.pravatar.cc/150?img=4')
+        ('musiclover', 'music@example.com', ?, 'Music Lover', 'https://i.pravatar.cc/150?img=1', 1, 'local'),
+        ('jdoe', 'john@example.com', ?, 'John Doe', 'https://i.pravatar.cc/150?img=2', 1, 'local'),
+        ('sarahm', 'sarah@example.com', ?, 'Sarah Mitchell', 'https://i.pravatar.cc/150?img=3', 1, 'local'),
+        ('alexj', 'alex@example.com', ?, 'Alex Johnson', 'https://i.pravatar.cc/150?img=4', 1, 'local')
     `,
       [hashedPassword, hashedPassword, hashedPassword, hashedPassword],
     );
@@ -200,34 +247,28 @@ async function seedDatabase(): Promise<void> {
         (1, 'Fading Light', 312000, 0, 156000),
         (1, 'Through the Noise', 267000, 1, 87000),
         (1, 'Last Dance', 289000, 0, 203000),
-
         (2, 'Static', 234000, 0, 45000),
         (2, 'Wavelength', 276000, 0, 52000),
         (2, 'Interference', 198000, 0, 38000),
         (2, 'Clear Signal', 245000, 0, 61000),
-
         (3, 'Neon Lights', 189000, 0, 450000),
         (3, 'Circuit Dreams', 223000, 0, 380000),
         (3, 'Binary Love', 207000, 0, 520000),
         (3, 'Virtual Reality', 245000, 1, 290000),
         (3, 'Disconnect', 198000, 0, 310000),
         (3, 'Reboot', 234000, 0, 275000),
-
         (4, 'Artificial', 256000, 0, 125000),
         (4, 'Machine Heart', 287000, 0, 98000),
         (4, 'Code Blue', 213000, 1, 87000),
-
         (5, 'Whiskey and Regrets', 267000, 0, 78000),
         (5, 'Country Road', 234000, 0, 92000),
         (5, 'Empty Chair', 298000, 0, 156000),
         (5, 'Morning Coffee', 189000, 0, 45000),
         (5, 'Old Photograph', 312000, 0, 67000),
-
         (6, 'Pulse', 198000, 0, 890000),
         (6, 'Thunder', 234000, 1, 670000),
         (6, 'Lightning Strike', 212000, 0, 540000),
         (6, 'Storm Chaser', 267000, 0, 450000),
-
         (7, 'Kaleidoscope Eyes', 289000, 0, 78000),
         (7, 'Cosmic Journey', 345000, 0, 92000),
         (7, 'Time Traveler', 298000, 0, 105000),
@@ -253,32 +294,27 @@ async function seedDatabase(): Promise<void> {
         (1, 20, 1, 3),
         (1, 22, 1, 4),
         (1, 29, 1, 5),
-
         (2, 10, 1, 1),
         (2, 13, 1, 2),
         (2, 24, 1, 3),
         (2, 25, 1, 4),
         (2, 26, 1, 5),
-
         (3, 1, 2, 1),
         (3, 5, 2, 2),
         (3, 10, 2, 3),
         (3, 12, 2, 4),
         (3, 21, 2, 5),
         (3, 27, 2, 6),
-
         (4, 6, 2, 1),
         (4, 7, 2, 2),
         (4, 8, 2, 3),
         (4, 9, 2, 4),
-
         (5, 1, 3, 1),
         (5, 2, 3, 2),
         (5, 3, 3, 3),
         (5, 6, 3, 4),
         (5, 20, 3, 5),
         (5, 22, 3, 6),
-
         (6, 10, 4, 1),
         (6, 11, 4, 2),
         (6, 12, 4, 3),

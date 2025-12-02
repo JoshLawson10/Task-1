@@ -12,7 +12,8 @@
     "paths": {
       "@config/*": ["../config/*"],
       "@lib/*": ["../lib/*"],
-      "@models/*": ["../models/*"]
+      "@models/*": ["../models/*"],
+      "@middleware/*": ["./middleware/*"]
     },
     "lib": ["ES2022", "DOM"]
   },

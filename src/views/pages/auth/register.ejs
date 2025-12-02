@@ -1,1 +1,229 @@
-<h1>Register</h1>
+<style>
+    .auth-container {
+        background: var(--color-bg-primary);
+        color: var(--color-text-primary);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: var(--spacing-xl);
+        height: 100vh;
+    }
+
+    .auth-content {
+        background: var(--color-bg-panel);
+        display: flex;
+        border-radius: 20px;
+        max-width: 1200px;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--color-border);
+        height: 90%;
+    }
+
+    .left {
+        width: 50%;
+        padding: var(--spacing-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .left-content {
+        max-width: 50%;
+        margin: 0 auto;
+    }
+
+    .tabs {
+        display: flex;
+        align-items: center;
+        width: fit-content;
+        background: var(--color-bg-surface);
+        gap: var(--spacing-sm);
+        padding: var(--spacing-xs);
+        margin-bottom: var(--spacing-lg);
+        border-radius: var(--border-radius);
+    }
+
+    .tabs a {
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border);
+        padding: var(--spacing-xs) var(--spacing-md);
+        border-radius: var(--border-radius);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        text-decoration: none;
+        transition: var(--transition-base);
+    }
+
+    .tabs .active {
+        background: var(--color-accent);
+        color: #000;
+        border-color: var(--color-accent);
+    }
+
+    .subtitle {
+        color: var(--color-text-muted);
+        margin-bottom: var(--spacing-lg);
+    }
+
+    form label {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+        margin-top: var(--spacing-md);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+
+    password-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: var(--font-size-sm);
+    }
+
+    .password-label a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+    }
+
+    input {
+        width: 100%;
+        padding: var(--spacing-sm);
+        border-radius: var(--border-radius);
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border);
+        color: var(--color-text-primary);
+        font-size: var(--font-size-sm);
+    }
+
+    input::placeholder {
+        color: var(--color-text-muted);
+    }
+
+    .submit {
+        margin-top: var(--spacing-lg);
+        width: 100%;
+        padding: var(--spacing-sm);
+        border-radius: var(--border-radius);
+        border: none;
+        background: var(--color-accent);
+        color: #000;
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: var(--transition-base);
+    }
+
+    .submit:hover {
+        background: var(--color-accent-hover);
+    }
+
+    .divider {
+        margin: var(--spacing-lg) 0;
+        text-align: center;
+        color: var(--color-text-muted);
+        position: relative;
+        font-size: var(--font-size-sm);
+    }
+
+    .divider span {
+        background: var(--color-bg-panel);
+        padding: 0 var(--spacing-sm);
+    }
+
+    .divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        height: 1px;
+        width: 100%;
+        background: var(--color-border);
+        z-index: -1;
+    }
+
+    .oauth {
+        width: 100%;
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-border);
+        cursor: pointer;
+        font-size: var(--font-size-sm);
+        color: var(--color-text-primary);
+        transition: var(--transition-base);
+    }
+
+    .oauth:hover {
+        border-color: var(--color-accent);
+        background: rgba(29, 185, 84, 0.1);
+    }
+
+    .oauth img {
+        width: 18px;
+    }
+
+    .signup {
+        margin-top: var(--spacing-md);
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+
+    .signup a {
+        color: var(--color-accent);
+        text-decoration: none;
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .right {
+        width: 50%;
+        position: relative;
+    }
+
+    .right img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        padding: var(--spacing-md);
+        border-radius: 25px;
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-content">
+        <div class="left">
+            <div class="left-content">
+                <div class="tabs">
+                    <a href="/auth/login" class="tab">Login</a>
+                    <a href="/auth/register" class="tab active">Sign Up</a>
+                </div>
+
+                <h2>Hey There!</h2>
+                <p class="subtitle">Please enter your details to register.</p>
+
+                <form action="api/auth/register" method="POST">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="Enter your full name" required>
+
+                    <label>Email address</label>
+                    <input type="email" name="email" placeholder="Enter your email address" required>
+
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Enter your password" required>
+
+                    <button class="submit" type="submit">Sign Up</button>
+                </form>
+
+                <p class="signup">Don't have an account yet? <a href="/auth/register">Sign up</a></p>
+
+            </div>
+        </div>
+        <div class="right">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="House">
+        </div>
+    </div>
+</div>

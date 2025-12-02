@@ -8,6 +8,17 @@ import usersRouter from "./api/users";
 import likesRouter from "./api/likes";
 
 export const register = (app: express.Application) => {
+  app.get("/auth/login", (req, res) => {
+    res.render("auth", { pageTitle: "Music App", content: "pages/auth/login" });
+  });
+
+  app.get("/auth/register", (req, res) => {
+    res.render("auth", {
+      pageTitle: "Music App",
+      content: "pages/auth/register",
+    });
+  });
+
   app.get("/", (req, res) => {
     res.render("index", { pageTitle: "Music App", content: "pages/home" });
   });

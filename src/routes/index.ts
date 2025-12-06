@@ -1,5 +1,8 @@
 import * as express from "express";
 
+import { isAuthenticated, isNotAuthenticated } from "@middleware/auth";
+import authRouter from "./auth";
+
 import albumsRouter from "./api/albums";
 import artistsRouter from "./api/artists";
 import playlistsRouter from "./api/playlists";
@@ -8,12 +11,12 @@ import usersRouter from "./api/users";
 import likesRouter from "./api/likes";
 
 export const register = (app: express.Application) => {
-  app.get("/auth/login", (req, res) => {
+  app.get("/auth/login", isNotAuthenticated, (req, res) => {
     app.set("layout", "layouts/auth");
     res.render("auth", { pageTitle: "Music App", content: "pages/auth/login" });
   });
 
-  app.get("/auth/register", (req, res) => {
+  app.get("/auth/register", isNotAuthenticated, (req, res) => {
     app.set("layout", "layouts/auth");
     res.render("auth", {
       pageTitle: "Music App",
@@ -22,41 +25,48 @@ export const register = (app: express.Application) => {
   });
 
   app.get("/", (req, res) => {
+    if (req.isAuthenticated()) {
+      return res.redirect("/home");
+    }
+    res.redirect("/auth/login");
+  });
+
+  app.get("/home", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/home" });
   });
 
-  app.get("/explore", (req, res) => {
+  app.get("/explore", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/explore" });
   });
 
-  app.get("/songs", (req, res) => {
+  app.get("/songs", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/songs" });
   });
 
-  app.get("/artists", (req, res) => {
+  app.get("/artists", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/artists" });
   });
 
-  app.get("/albums", (req, res) => {
+  app.get("/albums", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/albums" });
   });
 
-  app.get("/playlists", (req, res) => {
+  app.get("/playlists", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/playlists" });
   });
 
-  app.get("/liked", (req, res) => {
+  app.get("/liked", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Music App", content: "pages/liked" });
   });
 
-  app.get("/episodes", (req, res) => {
+  app.get("/episodes", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", {
       pageTitle: "Music App",
@@ -64,10 +74,12 @@ export const register = (app: express.Application) => {
     });
   });
 
-  app.use("/api/albums", albumsRouter);
-  app.use("/api/artists", artistsRouter);
-  app.use("/api/playlists", playlistsRouter);
-  app.use("/api/tracks", tracksRouter);
-  app.use("/api/users", usersRouter);
-  app.use("/api/likes", likesRouter);
+  app.use("/api/auth", authRouter);
+
+  app.use("/api/albums", isAuthenticated, albumsRouter);
+  app.use("/api/artists", isAuthenticated, artistsRouter);
+  app.use("/api/playlists", isAuthenticated, playlistsRouter);
+  app.use("/api/tracks", isAuthenticated, tracksRouter);
+  app.use("/api/users", isAuthenticated, usersRouter);
+  app.use("/api/likes", isAuthenticated, likesRouter);
 };

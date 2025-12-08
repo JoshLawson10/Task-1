@@ -13,13 +13,13 @@ import likesRouter from "./api/likes";
 export const register = (app: express.Application) => {
   app.get("/auth/login", isNotAuthenticated, (req, res) => {
     app.set("layout", "layouts/auth");
-    res.render("auth", { pageTitle: "Music App", content: "pages/auth/login" });
+    res.render("auth", { pageTitle: "Sonora", content: "pages/auth/login" });
   });
 
   app.get("/auth/register", isNotAuthenticated, (req, res) => {
     app.set("layout", "layouts/auth");
     res.render("auth", {
-      pageTitle: "Music App",
+      pageTitle: "Sonora",
       content: "pages/auth/register",
     });
   });
@@ -33,43 +33,43 @@ export const register = (app: express.Application) => {
 
   app.get("/home", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/home" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/home" });
   });
 
   app.get("/explore", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/explore" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/explore" });
   });
 
   app.get("/songs", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/songs" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/songs" });
   });
 
   app.get("/artists", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/artists" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/artists" });
   });
 
   app.get("/albums", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/albums" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/albums" });
   });
 
   app.get("/playlists", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/playlists" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/playlists" });
   });
 
   app.get("/liked", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
-    res.render("index", { pageTitle: "Music App", content: "pages/liked" });
+    res.render("index", { pageTitle: "Sonora", content: "pages/liked" });
   });
 
   app.get("/episodes", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", {
-      pageTitle: "Music App",
+      pageTitle: "Sonora",
       content: "pages/episodes",
     });
   });

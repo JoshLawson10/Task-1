@@ -17,7 +17,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   const verificationLink = `${process.env.APP_URL || "http://localhost:3000"}/api/auth/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"Music App" <shriekingyak100@gmail.com>',
+    from: process.env.SMTP_FROM || '"Sorora" <shriekingyak100@gmail.com>',
     to: email,
     subject: "Verify Your Email Address",
     html: `
@@ -36,7 +36,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎵 Welcome to Music App!</h1>
+              <h1>🎵 Welcome to Sonora!</h1>
             </div>
             <div class="content">
               <h2>Verify your email address</h2>
@@ -47,7 +47,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
               <p><strong>If you didn't create an account, you can safely ignore this email.</strong></p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} Music App. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Sonora. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -65,7 +65,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   console.log("SMTP_PASS:", process.env.SMTP_PASS ? "******" : undefined);
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"Music App" <shriekingyak100@gmail.com>',
+    from: process.env.SMTP_FROM || '"Sonora" <shriekingyak100@gmail.com>',
     to: email,
     subject: "Reset Your Password",
     html: `
@@ -84,7 +84,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎵 Music App</h1>
+              <h1>🎵 Sonora</h1>
             </div>
             <div class="content">
               <h2>Reset your password</h2>
@@ -95,7 +95,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
               <p><strong>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</strong></p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} Music App. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Sonora. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -113,7 +113,7 @@ export const sendMagicLinkEmail = async (email: string, token: string) => {
   console.log("SMTP_PASS:", process.env.SMTP_PASS ? "******" : undefined);
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"Music App" <shriekingyak100@gmail.com>',
+    from: process.env.SMTP_FROM || '"Sonora" <shriekingyak100@gmail.com>',
     to: email,
     subject: "Your Magic Link to Sign In",
     html: `
@@ -132,18 +132,18 @@ export const sendMagicLinkEmail = async (email: string, token: string) => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎵 Music App</h1>
+              <h1>🎵 Sonora</h1>
             </div>
             <div class="content">
               <h2>Sign in to your account</h2>
-              <p>Click the button below to sign in to your Music App account. This link will expire in 15 minutes.</p>
+              <p>Click the button below to sign in to your Sonora account. This link will expire in 15 minutes.</p>
               <a href="${magicLink}" class="button">Sign In</a>
               <p>Or copy and paste this link into your browser:</p>
               <p style="word-break: break-all; color: #666;">${magicLink}</p>
               <p><strong>If you didn't request this email, you can safely ignore it.</strong></p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} Music App. All rights reserved.</p>
+              <p>© ${new Date().getFullYear()} Sonora. All rights reserved.</p>
             </div>
           </div>
         </body>

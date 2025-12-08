@@ -353,6 +353,20 @@ router.post("/reset-password", async (req: Request, res: Response) => {
   }
 });
 
+// ============ GOOGLE OAUTH ============
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/",
+    failureRedirect: "/auth/login?error=Google authentication failed",
+  }),
+);
+
 // ============ LOGOUT ============
 
 router.get("/logout", (req: Request, res: Response) => {

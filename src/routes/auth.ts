@@ -4,7 +4,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { db } from "@config/database";
 import { Users } from "@models/index";
-import { sendVerificationEmail } from "@lib/emailService";
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} from "@lib/emailService";
+import { isNotAuthenticated } from "@middleware/auth";
 
 const router = Router();
 
@@ -120,6 +124,131 @@ router.get("/verify-email", async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Email verification error:", error);
     res.redirect("/auth/login?error=Invalid verification link");
+  }
+});
+
+// ============ PASSWORD RESET ============
+
+router.get("/forgot-password", isNotAuthenticated, (req, res) => {
+  res.render("pagesauth/forgot-password", {
+    pageTitle: "Forgot Password",
+    layout: "layouts/auth",
+  });
+});
+
+router.post("/forgot-password", async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    const user = await Users.findUnique({
+      email: email,
+      auth_provider: "local",
+    });
+
+    if (!user) {
+      return res.render("pages/auth/reset-sent", {
+        pageTitle: "Reset Email Sent",
+        layout: "layouts/auth",
+        email,
+      });
+    }
+
+    const token = jwt.sign(
+      { user_id: user.user_id },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "1h" },
+    );
+
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+    await db.run(
+      "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
+      [user.user_id, token, expiresAt],
+    );
+
+    await sendPasswordResetEmail(email, token);
+
+    res.render("pages/auth/reset-sent", {
+      pageTitle: "Reset Email Sent",
+      layout: "layouts/auth",
+      email,
+    });
+  } catch (error) {
+    console.error("Password reset error:", error);
+    res.redirect("/auth/forgot-password?error=Something went wrong");
+  }
+});
+
+router.get("/reset-password", async (req: Request, res: Response) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.redirect("/auth/login?error=Invalid reset link");
+  }
+
+  try {
+    jwt.verify(token as string, process.env.JWT_SECRET || "your-secret-key");
+
+    const tokenRecord = await db.get<any>(
+      "SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0 AND expires_at > datetime('now')",
+      token,
+    );
+
+    if (!tokenRecord) {
+      return res.redirect("/auth/login?error=Invalid or expired reset link");
+    }
+
+    res.render("pages/auth/reset-password", {
+      pageTitle: "Reset Password",
+      layout: "layouts/auth",
+      token,
+    });
+  } catch (error) {
+    res.redirect("/auth/login?error=Invalid reset link");
+  }
+});
+
+router.post("/reset-password", async (req: Request, res: Response) => {
+  try {
+    const { token, password, confirm_password } = req.body;
+
+    if (!token || !password) {
+      return res.redirect("/auth/login?error=Invalid request");
+    }
+
+    if (password !== confirm_password) {
+      return res.redirect(
+        `/auth/reset-password?token=${token}&error=Passwords do not match`,
+      );
+    }
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your-secret-key",
+    ) as { user_id: number };
+
+    const tokenRecord = await db.get<any>(
+      "SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0 AND expires_at > datetime('now')",
+      token,
+    );
+
+    if (!tokenRecord) {
+      return res.redirect("/auth/login?error=Invalid or expired reset link");
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+
+    await Users.updateById(decoded.user_id, { password_hash: password_hash });
+
+    await db.run(
+      "UPDATE password_reset_tokens SET used = 1 WHERE token = ?",
+      token,
+    );
+
+    res.redirect("/auth/login?success=Password reset successfully");
+  } catch (error) {
+    console.error("Password reset error:", error);
+    res.redirect("/auth/login?error=Something went wrong");
   }
 });
 

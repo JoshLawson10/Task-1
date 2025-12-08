@@ -8,22 +8,19 @@
                 </div>
 
                 <h2>Hey There!</h2>
-                <p class="subtitle">Please enter your details to register.</p>
+                <p class="subtitle">Please enter your details to create an account.</p>
 
-                <form action="/api/auth/signup" method="POST">
-                    <label>Display Name</label>
+                <form action="/api/auth/magic-link" method="POST">
+                    <label>Full Name</label>
                     <input type="text" name="display_name" placeholder="Enter your display name" required>
 
-                    <label>Email address</label>
+                    <label>Email</label>
                     <input type="email" name="email" placeholder="Enter your email address" required>
 
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Enter your password" required>
-
-                    <button class="submit" type="submit">Sign Up</button>
+                    <button class="submit" type="submit">Continue</button>
                 </form>
 
-                <p class="signup">Don't have an account yet? <a href="/auth/register">Sign up</a></p>
+                <p class="signup">Already have an account? <a href="/auth/login">Log in</a></p>
 
             </div>
         </div>

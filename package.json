@@ -20,6 +20,7 @@
   "dependencies": {
     "@hotwired/turbo": "^8.0.20",
     "bcrypt": "^6.0.0",
+    "connect-sqlite3": "^0.9.16",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.4",
     "@types/bcrypt": "^6.0.0",
+    "@types/connect-sqlite3": "^0.9.6",
     "@types/cookie-parser": "^1.4.10",
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.5",

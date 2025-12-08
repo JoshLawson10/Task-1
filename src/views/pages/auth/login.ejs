@@ -10,17 +10,11 @@
                 <h2>Welcome Back!</h2>
                 <p class="subtitle">Please enter your details to login.</p>
 
-                <form action="/api/auth/login" method="POST">
-                    <label>Email address</label>
+                <form action="/api/auth/magic-link" method="POST">
+                    <label>Email</label>
                     <input type="email" name="email" placeholder="Enter your email address" required>
 
-                    <label class="password-label">
-                        Password
-                        <a href="/auth/forgot-password">Forgot password?</a>
-                    </label>
-                    <input type="password" name="password" placeholder="Enter your password" required>
-
-                    <button class="submit" type="submit">Log In</button>
+                    <button class="submit" type="submit">Send Magic Link</button>
 
                     <div class="divider">
                         <span>OR</span>
@@ -32,13 +26,6 @@
                     <a class="oauth" href="/api/auth/apple"><img
                             src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/apple.svg" alt="">Continue
                         with Apple</a>
-                </form>
-
-                <form action="/api/auth/magic-link" method="POST" style="margin-top: 20px;">
-                    <p style="text-align: center; margin-bottom: 10px;">Or sign in with a magic link</p>
-                    <input type="email" name="email" placeholder="Enter your email address" required
-                        style="margin-bottom: 10px;">
-                    <button class="submit" type="submit" style="background: #6c63ff;">Send Magic Link</button>
                 </form>
 
                 <p class="signup">Don't have an account yet? <a href="/auth/register">Sign up</a></p>

@@ -27,6 +27,11 @@
   justify-content: center;
 }
 
+.left-content {
+  width: 100%;
+  align-items: center;
+}
+
 .tabs {
   display: flex;
   align-items: center;
@@ -67,17 +72,6 @@ form label {
   margin-top: var(--spacing-md);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
-}
-
-password-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--font-size-sm);
-}
-
-.password-label a {
-  color: var(--color-text-muted);
-  text-decoration: none;
 }
 
 input {

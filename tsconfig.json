@@ -8,15 +8,15 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@config/*": ["../config/*"],
-      "@lib/*": ["../lib/*"],
-      "@models/*": ["../models/*"],
-      "@middleware/*": ["./middleware/*"]
+      "@config/*": ["config/*"],
+      "@lib/*": ["lib/*"],
+      "@models/*": ["models/*"],
+      "@middleware/*": ["src/middleware/*"]
     },
     "lib": ["ES2022", "DOM"]
   },
-  "include": ["**/*.ts", "src/public/js/**/*"],
+  "include": ["src", "lib", "models", "tools", "config"],
   "exclude": ["node_modules", "dist"]
 }

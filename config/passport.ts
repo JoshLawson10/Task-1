@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
 import { db } from "./database";
-import { User } from "@models/user";
+import { Users } from "@models/index";
 
 passport.serializeUser((user: any, done) => {
   done(null, user.user_id);
@@ -10,10 +10,7 @@ passport.serializeUser((user: any, done) => {
 
 passport.deserializeUser(async (id: number, done) => {
   try {
-    const user = await db.get<User>(
-      "SELECT * FROM users WHERE user_id = ?",
-      id,
-    );
+    const user = await Users.findById(id);
     done(null, user);
   } catch (error) {
     done(error, null);
@@ -29,10 +26,7 @@ passport.use(
     async (email, password, done) => {
       console.log("Authenticating user with email:", email);
       try {
-        const user = await db.get<User>(
-          "SELECT * FROM users WHERE email = ? AND auth_provider = 'local'",
-          email,
-        );
+        const user = await Users.findUnique({ email: email });
 
         if (!user) {
           console.log("No user found with email:", email);

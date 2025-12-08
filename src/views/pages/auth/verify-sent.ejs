@@ -1,0 +1,27 @@
+<div class="container">
+    <div class="content">
+        <div class="left">
+            <div class="left-content">
+                <h2>Check Your Email</h2>
+                <p class="subtitle">We've sent a verification email to <strong><%= email %></strong></p>
+                
+                <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <p style="margin: 0;">📧 Please check your inbox and click the verification link to activate your account.</p>
+                </div>
+
+                <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                    The verification link will expire in 24 hours.
+                </p>
+
+                <p style="color: #666; font-size: 14px;">
+                    Didn't receive the email? Check your spam folder or <a href="/auth/register" style="color: #1db954;">sign up again</a>.
+                </p>
+
+                <a href="/auth/login" class="submit" style="display: inline-block; text-align: center; text-decoration: none; margin-top: 20px;">Back to Login</a>
+            </div>
+        </div>
+        <div class="right">
+            <img src="https://images.unsplash.com/photo-1557200134-90327ee9fafa" alt="Email">
+        </div>
+    </div>
+</div>

@@ -1,10 +1,22 @@
 <header class="navbar" data-turbo-permanent>
     <input type="text" name="search" id="search" class="search" placeholder="Search for music...">
     <div class="user-menu">
-        <div class="user-avatar"></div>
-        <div class="details">
-            <h4>User Name</h4>
-            <p>User Email</p>
-        </div>
+        <% if (user && user.profile_image_url) { %>
+            <img src="<%= user.profile_image_url %>" alt="<%= user.display_name || 'User' %>" class="user-avatar">
+            <% } else { %>
+                <div class="user-avatar"></div>
+                <% } %>
+                    <div class="details">
+                        <h4>
+                            <%= user ? (user.display_name || user.email) : 'Guest' %>
+                        </h4>
+                        <p>
+                            <%= user ? user.email : 'Not logged in' %>
+                        </p>
+                    </div>
+                    <a href="/api/auth/logout"
+                        style="margin-left: 12px; color: var(--color-text-secondary); text-decoration: none;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
     </div>
 </header>

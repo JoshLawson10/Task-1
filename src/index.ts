@@ -1,9 +1,14 @@
+import "dotenv/config";
+
 import express from "express";
 import expressEjsLayouts from "express-ejs-layouts";
 import cookieParser from "cookie-parser";
+import session from "express-session";
 import path from "path";
 import logger from "morgan";
+import passport from "@config/passport";
 import * as routes from "./routes/index";
+import { attachUser } from "@middleware/auth";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -37,8 +42,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use(
+  session({
+    secret:
+      process.env.SESSION_SECRET || "your-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+    },
+  }),
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(attachUser);
+
 app.use(expressEjsLayouts);
-app.set("layout", "layouts/layout");
+app.set("layout", "layouts/app");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));

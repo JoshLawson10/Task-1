@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="content">
+        <div class="left">
+            <div class="left-content">
+                <div class="tabs">
+                    <a href="/auth/login" class="tab"><i class="fa-solid fa-arrow-right-to-bracket"></i> Log In</a>
+                    <a href="/auth/register" class="tab active"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
+                </div>
+
+                <h2>Hey There!</h2>
+                <p class="subtitle">Please enter your details to create an account.</p>
+
+                <form action="/api/auth/magic-link" method="POST">
+                    <label>Full Name</label>
+                    <input type="text" name="display_name" placeholder="Enter your display name" required>
+
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Enter your email address" required>
+
+                    <button class="submit" type="submit">Continue</button>
+                </form>
+
+                <p class="signup">Already have an account? <a href="/auth/login">Log In</a></p>
+
+            </div>
+        </div>
+        <div class="right">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="House">
+        </div>
+    </div>
+</div>

@@ -132,7 +132,7 @@ router.get("/verify-email", async (req: Request, res: Response) => {
 
 router.post("/magic-link", async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
+    const email = req.body.email;
 
     console.log("Registering user via magic link with email:", email);
 
@@ -171,11 +171,15 @@ router.post("/magic-link", async (req: Request, res: Response) => {
 
     await sendMagicLinkEmail(email, token);
 
+    console.log("Magic link email sent.");
+
     res.render("pages/auth/magic-link-sent", {
       pageTitle: "Check Your Email",
       layout: "layouts/auth",
       email,
     });
+
+    console.log("Rendered magic link sent page.");
   } catch (error) {
     console.error("Magic link error:", error);
     res.redirect("/auth/login?error=Something went wrong");

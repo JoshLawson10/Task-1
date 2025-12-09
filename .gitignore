@@ -3,3 +3,4 @@ package-lock.json
 dist/
 .database/
 .env
+project_init.sh

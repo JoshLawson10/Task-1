@@ -37,6 +37,24 @@ router.get("/:userId", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/me", async (req: Request, res: Response) => {
+  try {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      console.log("Unauthorized access to /me endpoint");
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = req.user as User;
+
+    console.log("Fetching current user:", user.user_id);
+
+    res.json(user);
+  } catch (error: any) {
+    console.error("Error fetching current user:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get("/:userId/playlists", async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;

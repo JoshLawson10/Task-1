@@ -5,10 +5,23 @@ class MusicPlayer {
     this.isPlaying = false;
     this.volume = 0.5;
     this.audio.volume = this.volume;
-    this.currentUserId = 1; // TODO: Get from session/auth
+    this.currentUserId = null;
 
+    this.fetchCurrentUser();
     this.initializeElements();
     this.attachEventListeners();
+  }
+
+  async fetchCurrentUser() {
+    try {
+      const response = await fetch("/api/users/me");
+      if (response.ok) {
+        const user = await response.json();
+        this.currentUserId = user.user_id;
+      }
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    }
   }
 
   initializeElements() {
@@ -86,7 +99,6 @@ class MusicPlayer {
     if (this.artistName)
       this.artistName.textContent = track.artist_name || "Unknown Artist";
 
-    // TODO: Load actual audio file
     this.audio.src = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${(track.track_id % 16) + 1}.mp3`;
 
     if (track.duration_ms && this.totalTimeEl) {
@@ -94,7 +106,6 @@ class MusicPlayer {
     }
 
     await this.updateLikeButton();
-
     await this.incrementPlayCount(track.track_id);
   }
 
@@ -244,7 +255,7 @@ class MusicPlayer {
   }
 
   async toggleLike() {
-    if (!this.currentTrack) return;
+    if (!this.currentTrack || !this.currentUserId) return;
 
     const icon = this.likeBtn?.querySelector("i");
     if (!icon) return;
@@ -278,14 +289,13 @@ class MusicPlayer {
           icon.classList.add("fa-solid");
         }
       }
-      updateLikeButton();
     } catch (error) {
       console.error("Error toggling like:", error);
     }
   }
 
   async updateLikeButton() {
-    if (!this.currentTrack || !this.likeBtn) return;
+    if (!this.currentTrack || !this.likeBtn || !this.currentUserId) return;
 
     const icon = this.likeBtn.querySelector("i");
     if (!icon) return;

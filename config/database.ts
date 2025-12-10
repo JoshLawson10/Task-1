@@ -52,6 +52,11 @@ async function initDatabase(): Promise<void> {
         google_id TEXT UNIQUE,
         microsoft_id TEXT UNIQUE,
         auth_provider TEXT DEFAULT 'local',
+        is_active BOOLEAN DEFAULT TRUE,
+        failed_login_attempts INTEGER DEFAULT 0,
+        account_locked_until DATETIME,
+        last_login_at DATETIME,
+        deleted_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
@@ -99,6 +104,7 @@ async function initDatabase(): Promise<void> {
         artist_name TEXT NOT NULL,
         bio TEXT,
         profile_image_url TEXT,
+        deleted_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -110,6 +116,7 @@ async function initDatabase(): Promise<void> {
         album_title TEXT NOT NULL,
         release_year INTEGER,
         cover_image_url TEXT,
+        deleted_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (artist_id) REFERENCES artists(artist_id)
       );
@@ -123,8 +130,22 @@ async function initDatabase(): Promise<void> {
         duration_ms INTEGER NOT NULL,
         explicit BOOLEAN DEFAULT FALSE,
         play_count BIGINT NOT NULL DEFAULT 0,
+        deleted_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (album_id) REFERENCES albums(album_id)
+      );
+    `);
+
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS track_artists (
+        track_id INTEGER NOT NULL,
+        artist_id INTEGER NOT NULL,
+        is_primary BOOLEAN DEFAULT TRUE,
+        position INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (track_id, artist_id),
+        FOREIGN KEY (track_id) REFERENCES tracks(track_id) ON DELETE CASCADE,
+        FOREIGN KEY (artist_id) REFERENCES artists(artist_id) ON DELETE CASCADE
       );
     `);
 
@@ -136,6 +157,7 @@ async function initDatabase(): Promise<void> {
         description TEXT,
         cover_image_url TEXT,
         is_public BOOLEAN DEFAULT TRUE,
+        deleted_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -168,6 +190,18 @@ async function initDatabase(): Promise<void> {
     `);
 
     await db.exec(`
+      CREATE TABLE IF NOT EXISTS session_fingerprints (
+        session_id TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        ip_address TEXT NOT NULL,
+        user_agent TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+      );
+    `);
+
+    await db.exec(`
       CREATE INDEX IF NOT EXISTS idx_tracks_album ON tracks(album_id);
       CREATE INDEX IF NOT EXISTS idx_playlists_user ON playlists(user_id);
       CREATE INDEX IF NOT EXISTS idx_username ON users(username);
@@ -185,6 +219,13 @@ async function initDatabase(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_magic_link_token ON magic_link_tokens(token);
       CREATE INDEX IF NOT EXISTS idx_verification_token ON email_verification_tokens(token);
       CREATE INDEX IF NOT EXISTS idx_reset_token ON password_reset_tokens(token);
+      CREATE INDEX IF NOT EXISTS idx_users_deleted ON users(deleted_at);
+      CREATE INDEX IF NOT EXISTS idx_artists_deleted ON artists(deleted_at);
+      CREATE INDEX IF NOT EXISTS idx_albums_deleted ON albums(deleted_at);
+      CREATE INDEX IF NOT EXISTS idx_tracks_deleted ON tracks(deleted_at);
+      CREATE INDEX IF NOT EXISTS idx_playlists_deleted ON playlists(deleted_at);
+      CREATE INDEX IF NOT EXISTS idx_track_artists_track ON track_artists(track_id);
+      CREATE INDEX IF NOT EXISTS idx_track_artists_artist ON track_artists(artist_id);
     `);
 
     await seedDatabase();

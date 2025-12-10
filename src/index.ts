@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import * as fs from "fs";
 import express from "express";
 import expressEjsLayouts from "express-ejs-layouts";
 import cookieParser from "cookie-parser";
@@ -19,6 +20,24 @@ import { db, database, initDatabase } from "@config/database";
 initDatabase();
 app.locals.db = db;
 app.locals.database = database;
+
+// ---------- Ensure Uploads Directory Exists ----------
+const uploadsDir = path.join(__dirname, "../uploads/profile-images");
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("✓ Created uploads directory:", uploadsDir);
+} else {
+  console.log("✓ Uploads directory already exists:", uploadsDir);
+}
+
+const gitkeepPath = path.join(uploadsDir, ".gitkeep");
+if (!fs.existsSync(gitkeepPath)) {
+  fs.writeFileSync(gitkeepPath, "");
+  console.log("✓ Created .gitkeep file");
+}
+
+console.log("✓ Upload directory setup complete!");
 
 // ---------- CORS Middleware ----------
 app.use((req, res, next) => {
@@ -67,6 +86,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // ---------- Routes ----------
 routes.register(app);

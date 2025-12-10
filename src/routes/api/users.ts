@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { User, Users, Playlist } from "@models/index";
+import { upload, deleteOldProfileImage } from "@middleware/upload";
 
 const router = Router();
 
@@ -68,23 +69,50 @@ router.get("/:userId/playlists", async (req: Request, res: Response) => {
   }
 });
 
-router.put("/:userId", async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const userData = req.body;
+router.put(
+  "/:userId",
+  upload.single("profile_image"),
+  async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      const userData = req.body;
 
-    const updatedUser: boolean = await Users.updateById(userId, userData);
+      if (req.file) {
+        const currentUser = await Users.findById(userId);
 
-    if (!updatedUser) {
-      throw new Error("User not found or update failed");
+        if (currentUser?.profile_image_url) {
+          deleteOldProfileImage(currentUser.profile_image_url);
+        }
+
+        userData.profile_image_url = `/uploads/profile-images/${req.file.filename}`;
+      }
+
+      userData.updated_at = new Date().toISOString();
+
+      const updatedUser: boolean = await Users.updateById(userId, userData);
+
+      if (!updatedUser) {
+        if (req.file) {
+          deleteOldProfileImage(`/uploads/profile-images/${req.file.filename}`);
+        }
+        throw new Error("User not found or update failed");
+      }
+
+      const user = await Users.findById(userId);
+      res.json(user);
+    } catch (error: any) {
+      console.error("Error updating user:", error);
+
+      if (req.file) {
+        deleteOldProfileImage(
+          `/uploads/profile-images/${(req as any).file.filename}`,
+        );
+      }
+
+      res.status(500).json({ error: error.message });
     }
-
-    res.json(updatedUser);
-  } catch (error: any) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
+  },
+);
 
 router.delete("/:userId", async (req: Request, res: Response) => {
   try {

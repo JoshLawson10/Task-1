@@ -4,3 +4,4 @@ dist/
 .database/
 .env
 project_init.sh
+uploads/

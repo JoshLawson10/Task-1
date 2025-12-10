@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { db } from "@config/database";
 import { Users } from "@models/index";
 import { sendMagicLinkEmail } from "@lib/emailService";
+import { upload, deleteOldProfileImage } from "@middleware/upload";
 
 const router = Router();
 
@@ -161,46 +162,68 @@ router.get("/onboarding", (req: Request, res: Response) => {
   });
 });
 
-router.post("/onboarding", async (req: Request, res: Response) => {
-  try {
-    if (!req.isAuthenticated()) {
-      return res.redirect("/auth/login");
-    }
-
-    const user = req.user as any;
-    const { display_name, username, profile_image_url } = req.body;
-
-    if (!display_name || display_name.trim() === "") {
-      return res.redirect("/auth/onboarding?error=Display name is required");
-    }
-
-    if (username && username.trim() !== "") {
-      const existingUser = await Users.findUnique({ username });
-      if (existingUser && existingUser.user_id !== user.user_id) {
-        return res.redirect("/auth/onboarding?error=Username already taken");
+router.post(
+  "/onboarding",
+  upload.single("profile_image"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.redirect("/auth/login");
       }
+
+      const user = req.user as any;
+      const { display_name, username, profile_image_url } = req.body;
+
+      if (!display_name || display_name.trim() === "") {
+        if (req.file) {
+          deleteOldProfileImage(`/uploads/profile-images/${req.file.filename}`);
+        }
+        return res.redirect("/auth/onboarding?error=Display name is required");
+      }
+
+      if (username && username.trim() !== "") {
+        const existingUser = await Users.findUnique({ username });
+        if (existingUser && existingUser.user_id !== user.user_id) {
+          if (req.file) {
+            deleteOldProfileImage(
+              `/uploads/profile-images/${req.file.filename}`,
+            );
+          }
+          return res.redirect("/auth/onboarding?error=Username already taken");
+        }
+      }
+
+      const updateData: any = {
+        display_name: display_name.trim(),
+        updated_at: new Date().toISOString(),
+      };
+
+      if (username && username.trim() !== "") {
+        updateData.username = username.trim();
+      }
+
+      if (req.file) {
+        if (user.profile_image_url) {
+          deleteOldProfileImage(user.profile_image_url);
+        }
+        updateData.profile_image_url = `/uploads/profile-images/${req.file.filename}`;
+      } else if (profile_image_url && profile_image_url.trim() !== "") {
+        updateData.profile_image_url = profile_image_url.trim();
+      }
+
+      await Users.updateById(user.user_id, updateData);
+
+      res.redirect("/");
+    } catch (error) {
+      console.error("Onboarding error:", error);
+
+      if (req.file) {
+        deleteOldProfileImage(`/uploads/profile-images/${req.file.filename}`);
+      }
+
+      res.redirect("/auth/onboarding?error=Something went wrong");
     }
-
-    const updateData: any = {
-      display_name: display_name.trim(),
-      updated_at: new Date().toISOString(),
-    };
-
-    if (username && username.trim() !== "") {
-      updateData.username = username.trim();
-    }
-
-    if (profile_image_url && profile_image_url.trim() !== "") {
-      updateData.profile_image_url = profile_image_url.trim();
-    }
-
-    await Users.updateById(user.user_id, updateData);
-
-    res.redirect("/");
-  } catch (error) {
-    console.error("Onboarding error:", error);
-    res.redirect("/auth/onboarding?error=Something went wrong");
-  }
-});
+  },
+);
 
 export default router;

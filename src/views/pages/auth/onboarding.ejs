@@ -11,19 +11,43 @@
             </div>
             <% } %>
 
-                <form action="/api/auth/onboarding" method="POST">
-                    <label for="display_name">Name</label>
+                <form action="/api/auth/onboarding" method="POST" enctype="multipart/form-data">
+                    <label for="display_name">Display Name *</label>
                     <input type="text" id="display_name" name="display_name" placeholder="How should we call you?"
                         required minlength="2" maxlength="50">
 
-                    <label for="username">Username</label>
+                    <label for="username">Username (optional)</label>
                     <input type="text" id="username" name="username" placeholder="Choose a unique username"
                         pattern="[a-zA-Z0-9_]{3,20}"
                         title="Username must be 3-20 characters, letters, numbers, and underscores only">
 
-                    <label for="profile_image_url">Profile Image URL</label>
+                    <label for="profile_image">Profile Image</label>
+                    <div style="margin-bottom: 12px;">
+                        <input type="file" id="profile_image" name="profile_image"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" style="margin-bottom: 8px;">
+                        <p style="font-size: 12px; color: var(--color-text-muted); margin: 4px 0;">
+                            Upload an image (JPEG, PNG, GIF, or WebP, max 5MB)
+                        </p>
+                    </div>
+
+                    <div id="image-preview" style="display: none; margin-bottom: 16px; text-align: center;">
+                        <img id="preview-img" src="" alt="Preview"
+                            style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--color-accent);">
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <p
+                            style="font-size: 14px; color: var(--color-text-secondary); margin-bottom: 8px; text-align: center;">
+                            — OR —
+                        </p>
+                    </div>
+
+                    <label for="profile_image_url">Profile Image URL (optional)</label>
                     <input type="url" id="profile_image_url" name="profile_image_url"
                         placeholder="https://example.com/your-photo.jpg">
+                    <p style="font-size: 12px; color: var(--color-text-muted); margin: 4px 0 16px 0;">
+                        Provide a URL if you prefer not to upload
+                    </p>
 
                     <button class="submit" type="submit">Complete Setup</button>
                 </form>
@@ -46,4 +70,39 @@
         errorDiv.innerHTML = `<p style="margin: 0; color: #ff3b30;">⚠️ ${decodeURIComponent(error)}</p>`;
         form.parentElement.insertBefore(errorDiv, form);
     }
+
+    const fileInput = document.getElementById('profile_image');
+    const urlInput = document.getElementById('profile_image_url');
+    const previewContainer = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+
+    fileInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            urlInput.value = '';
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                fileInput.value = '';
+                previewContainer.style.display = 'none';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                previewImg.src = event.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    });
+
+    urlInput.addEventListener('input', function () {
+        if (urlInput.value.trim() !== '') {
+            fileInput.value = '';
+            previewContainer.style.display = 'none';
+        }
+    });
 </script>

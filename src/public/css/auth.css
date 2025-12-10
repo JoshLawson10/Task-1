@@ -11,54 +11,14 @@
 .content {
   background: var(--color-bg-panel);
   display: flex;
+  flex-direction: column;
+  align-items: center;
   border-radius: 20px;
+  padding: var(--spacing-xl);
   max-width: 1200px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
-  height: 90%;
-}
-
-.left {
-  width: 50%;
-  padding: var(--spacing-xl);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.left-content {
-  width: 100%;
-  align-items: center;
-}
-
-.tabs {
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  background: var(--color-bg-surface);
-  gap: var(--spacing-sm);
-  padding: var(--spacing-xs);
-  margin-bottom: var(--spacing-lg);
-  border-radius: var(--border-radius);
-}
-
-.tabs a {
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--border-radius);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  text-decoration: none;
-  transition: var(--transition-base);
-}
-
-.tabs .active {
-  background: var(--color-accent);
-  color: #000;
-  border-color: var(--color-accent);
 }
 
 .subtitle {
@@ -107,27 +67,26 @@ input::placeholder {
 }
 
 .divider {
-  margin: var(--spacing-lg) 0;
-  text-align: center;
-  color: var(--color-text-muted);
-  position: relative;
-  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg) 0;
 }
 
-.divider span {
-  background: var(--color-bg-panel);
-  padding: 0 var(--spacing-sm);
+.divider::before,
+.divider::after {
+  content: "";
+  top: 50%;
+  height: 1px;
+  background-color: var(--color-border);
+  flex-grow: 1;
 }
 
 .divider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  height: 1px;
-  width: 100%;
-  background: var(--color-border);
-  z-index: -1;
+  margin-right: var(--spacing-sm);
+}
+
+.divider::after {
+  margin-left: var(--spacing-sm);
 }
 
 .oauth {
@@ -155,29 +114,10 @@ input::placeholder {
   width: 18px;
 }
 
-.signup {
-  margin-top: var(--spacing-md);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-}
-
-.signup a {
+a {
   color: var(--color-accent);
   text-decoration: none;
   font-weight: var(--font-weight-semibold);
-}
-
-.right {
-  width: 50%;
-  position: relative;
-}
-
-.right img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  padding: var(--spacing-md);
-  border-radius: 25px;
 }
 
 .card {

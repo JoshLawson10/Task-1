@@ -11,24 +11,16 @@ import usersRouter from "./api/users";
 import likesRouter from "./api/likes";
 
 export const register = (app: express.Application) => {
-  app.get("/auth/login", isNotAuthenticated, (req, res) => {
+  app.get("/auth", isNotAuthenticated, (req, res) => {
     app.set("layout", "layouts/auth");
-    res.render("auth", { pageTitle: "Sonora", content: "pages/auth/login" });
-  });
-
-  app.get("/auth/register", isNotAuthenticated, (req, res) => {
-    app.set("layout", "layouts/auth");
-    res.render("auth", {
-      pageTitle: "Sonora",
-      content: "pages/auth/register",
-    });
+    res.render("auth", { pageTitle: "Sonora", content: "pages/auth/auth" });
   });
 
   app.get("/", (req, res) => {
     if (req.isAuthenticated()) {
       return res.redirect("/home");
     }
-    res.redirect("/auth/login");
+    res.redirect("/auth");
   });
 
   app.get("/home", isAuthenticated, (req, res) => {

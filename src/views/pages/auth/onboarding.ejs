@@ -1,0 +1,49 @@
+<div class="container">
+    <div class="content">
+        <h2>Welcome to Sonora! 🎵</h2>
+        <p class="subtitle">Let's set up your profile</p>
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div class="card"
+                style="background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.3); margin-bottom: 20px;">
+                <p style="margin: 0; color: #ff3b30;">⚠️ <%= error %>
+                </p>
+            </div>
+            <% } %>
+
+                <form action="/api/auth/onboarding" method="POST">
+                    <label for="display_name">Name</label>
+                    <input type="text" id="display_name" name="display_name" placeholder="How should we call you?"
+                        required minlength="2" maxlength="50">
+
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a unique username"
+                        pattern="[a-zA-Z0-9_]{3,20}"
+                        title="Username must be 3-20 characters, letters, numbers, and underscores only">
+
+                    <label for="profile_image_url">Profile Image URL</label>
+                    <input type="url" id="profile_image_url" name="profile_image_url"
+                        placeholder="https://example.com/your-photo.jpg">
+
+                    <button class="submit" type="submit">Complete Setup</button>
+                </form>
+
+                <p style="color: var(--color-text-muted); font-size: 12px; margin-top: 20px; text-align: center;">
+                    You can always update these details later in your profile settings.
+                </p>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+
+    if (error && !document.querySelector('.card')) {
+        const form = document.querySelector('form');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'card';
+        errorDiv.style.cssText = 'background: rgba(255, 59, 48, 0.1); border-color: rgba(255, 59, 48, 0.3); margin-bottom: 20px;';
+        errorDiv.innerHTML = `<p style="margin: 0; color: #ff3b30;">⚠️ ${decodeURIComponent(error)}</p>`;
+        form.parentElement.insertBefore(errorDiv, form);
+    }
+</script>

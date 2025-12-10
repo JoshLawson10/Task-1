@@ -97,11 +97,19 @@ router.get("/magic-link/verify", async (req: Request, res: Response) => {
       return res.redirect("/auth/login?error=User not found");
     }
 
+    const needsOnboarding =
+      !user.display_name || user.display_name.trim() === "";
+
     req.login(user, (err) => {
       if (err) {
         console.error("Login error:", err);
         return res.redirect("/auth/login?error=Login failed");
       }
+
+      if (needsOnboarding) {
+        return res.redirect("/auth/onboarding");
+      }
+
       res.redirect("/");
     });
   } catch (error) {
@@ -133,6 +141,66 @@ router.get("/logout", (req: Request, res: Response) => {
     }
     res.redirect("/auth/login");
   });
+});
+
+// ============ ONBOARDING ============
+
+router.get("/onboarding", (req: Request, res: Response) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/auth/login");
+  }
+
+  const user = req.user as any;
+  if (user.display_name && user.display_name.trim() !== "") {
+    return res.redirect("/");
+  }
+
+  res.render("pages/auth/onboarding", {
+    pageTitle: "Complete Your Profile",
+    layout: "layouts/auth",
+  });
+});
+
+router.post("/onboarding", async (req: Request, res: Response) => {
+  try {
+    if (!req.isAuthenticated()) {
+      return res.redirect("/auth/login");
+    }
+
+    const user = req.user as any;
+    const { display_name, username, profile_image_url } = req.body;
+
+    if (!display_name || display_name.trim() === "") {
+      return res.redirect("/auth/onboarding?error=Display name is required");
+    }
+
+    if (username && username.trim() !== "") {
+      const existingUser = await Users.findUnique({ username });
+      if (existingUser && existingUser.user_id !== user.user_id) {
+        return res.redirect("/auth/onboarding?error=Username already taken");
+      }
+    }
+
+    const updateData: any = {
+      display_name: display_name.trim(),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (username && username.trim() !== "") {
+      updateData.username = username.trim();
+    }
+
+    if (profile_image_url && profile_image_url.trim() !== "") {
+      updateData.profile_image_url = profile_image_url.trim();
+    }
+
+    await Users.updateById(user.user_id, updateData);
+
+    res.redirect("/");
+  } catch (error) {
+    console.error("Onboarding error:", error);
+    res.redirect("/auth/onboarding?error=Something went wrong");
+  }
 });
 
 export default router;

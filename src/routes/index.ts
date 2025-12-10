@@ -16,6 +16,10 @@ export const register = (app: express.Application) => {
     res.render("auth", { pageTitle: "Sonora", content: "pages/auth/auth" });
   });
 
+  app.get("/auth/onboarding", (req, res) => {
+    res.redirect("/api/auth/onboarding");
+  });
+
   app.get("/", (req, res) => {
     if (req.isAuthenticated()) {
       return res.redirect("/home");

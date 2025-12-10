@@ -1,11 +1,9 @@
 import { Router, Request, Response } from "express";
 import passport from "passport";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { db } from "@config/database";
 import { Users } from "@models/index";
 import { sendMagicLinkEmail } from "@lib/emailService";
-import { isNotAuthenticated } from "@middleware/auth";
 
 const router = Router();
 

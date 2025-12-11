@@ -57,6 +57,15 @@ export const register = (app: express.Application) => {
     res.render("index", { pageTitle: "Sonora", content: "pages/playlists" });
   });
 
+  app.get("/playlist/:id", isAuthenticated, (req, res) => {
+    app.set("layout", "layouts/app");
+    res.render("index", {
+      pageTitle: "Sonora",
+      content: "pages/playlist-view",
+      playlistId: req.params.id,
+    });
+  });
+
   app.get("/liked", isAuthenticated, (req, res) => {
     app.set("layout", "layouts/app");
     res.render("index", { pageTitle: "Sonora", content: "pages/liked" });

@@ -2,27 +2,28 @@ import { Router, Request, Response } from "express";
 import {
   Playlist,
   Playlists,
-  Track,
-  Tracks,
   PlaylistTracks,
   PlaylistTrack,
 } from "@models/index";
+import { db } from "@config/database";
 
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
-  const { name, is_public } = req.body;
+  const { playlist_name, description, is_public, user_id } = req.body;
 
-  if (!name || is_public === undefined) {
+  if (!playlist_name || is_public === undefined || !user_id) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
     const newPlaylist: Playlist | null = await Playlists.create({
-      data: {
-        ...req.body,
-        created_at: new Date().toISOString(),
-      },
+      user_id,
+      playlist_name,
+      description,
+      is_public,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     });
 
     res.status(201).json(newPlaylist);
@@ -80,9 +81,24 @@ router.get("/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Playlist not found" });
     }
 
-    const tracks: Track[] = await Playlists.tracks(Number(playlistId));
+    const tracksRaw = await db.all<any>(
+      `SELECT 
+        t.*,
+        pt.added_at,
+        pt.position,
+        a.album_title as album_name,
+        ar.artist_name,
+        a.cover_image_url
+      FROM playlist_tracks pt
+      JOIN tracks t ON pt.track_id = t.track_id
+      LEFT JOIN albums a ON t.album_id = a.album_id
+      LEFT JOIN artists ar ON a.artist_id = ar.artist_id
+      WHERE pt.playlist_id = ?
+      ORDER BY pt.position ASC`,
+      playlistId,
+    );
 
-    res.json({ playlist, tracks });
+    res.json({ playlist, tracks: tracksRaw });
   } catch (error) {
     console.error("Error fetching playlist:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -91,9 +107,9 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.put("/:id", async (req: Request, res: Response) => {
   const playlistId = req.params.id;
-  const { name, is_public } = req.body;
+  const { playlist_name, description, is_public } = req.body;
 
-  if (!name || is_public === undefined) {
+  if (!playlist_name || is_public === undefined) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
@@ -101,7 +117,9 @@ router.put("/:id", async (req: Request, res: Response) => {
     const updatedPlaylist: boolean = await Playlists.update(
       { playlist_id: Number(playlistId) },
       {
-        ...req.body,
+        playlist_name,
+        description,
+        is_public,
         updated_at: new Date().toISOString(),
       },
     );
@@ -110,7 +128,8 @@ router.put("/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Playlist not found" });
     }
 
-    res.json(updatedPlaylist);
+    const playlist = await Playlists.findById(playlistId);
+    res.json(playlist);
   } catch (error) {
     console.error("Error updating playlist:", error);
     res.status(500).json({ error: "Internal server error" });

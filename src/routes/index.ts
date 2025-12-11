@@ -62,14 +62,6 @@ export const register = (app: express.Application) => {
     res.render("index", { pageTitle: "Sonora", content: "pages/liked" });
   });
 
-  app.get("/episodes", isAuthenticated, (req, res) => {
-    app.set("layout", "layouts/app");
-    res.render("index", {
-      pageTitle: "Sonora",
-      content: "pages/episodes",
-    });
-  });
-
   app.use("/api/auth", authRouter);
 
   app.use("/api/albums", isAuthenticated, albumsRouter);

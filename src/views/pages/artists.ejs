@@ -1,2 +1,296 @@
-<h1>Atrists</h1>
-<p>This is the Atrists view.</p>
+<style>
+    .artists-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: var(--spacing-sm);
+        background: var(--color-bg-surface);
+        padding: var(--spacing-xs);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-border);
+    }
+
+    .filter-tab {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: none;
+        background: transparent;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all var(--transition-base);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+    }
+
+    .filter-tab:hover {
+        color: var(--color-text-primary);
+        background: rgba(29, 185, 84, 0.1);
+    }
+
+    .filter-tab.active {
+        background: var(--color-accent);
+        color: #000;
+    }
+
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .artist-card {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-lg);
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        border: 1px solid var(--color-border);
+    }
+
+    .artist-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .artist-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        margin: 0 auto var(--spacing-md);
+        object-fit: cover;
+        border: 3px solid var(--color-border);
+        transition: all var(--transition-base);
+    }
+
+    .artist-card:hover .artist-avatar {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 20px rgba(29, 185, 84, 0.4);
+    }
+
+    .artist-name {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--spacing-xs);
+        color: var(--color-text-primary);
+    }
+
+    .artist-meta {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-md);
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .artist-meta span {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+
+    .play-artist-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background: var(--color-accent);
+        color: #000;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        box-shadow: var(--shadow-md);
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    .artist-card:hover .play-artist-btn {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .play-artist-btn:hover {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .alphabet-nav {
+        display: flex;
+        gap: var(--spacing-xs);
+        overflow-x: auto;
+        padding: var(--spacing-md) 0;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .alphabet-nav::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .alphabet-nav button {
+        min-width: 32px;
+        height: 32px;
+        border: 1px solid var(--color-border);
+        background: var(--color-bg-surface);
+        color: var(--color-text-secondary);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+    }
+
+    .alphabet-nav button:hover {
+        background: var(--color-accent);
+        color: #000;
+        border-color: var(--color-accent);
+    }
+
+    .alphabet-nav button.active {
+        background: var(--color-accent);
+        color: #000;
+        border-color: var(--color-accent);
+    }
+</style>
+
+<div class="artists-header">
+    <h1>Artists</h1>
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="following">Following</button>
+        <button class="filter-tab" data-filter="recent">Recent</button>
+    </div>
+</div>
+
+<div class="alphabet-nav">
+    <button data-letter="all" class="active">All</button>
+    <button data-letter="A">A</button>
+    <button data-letter="B">B</button>
+    <button data-letter="C">C</button>
+    <button data-letter="D">D</button>
+    <button data-letter="E">E</button>
+    <button data-letter="F">F</button>
+    <button data-letter="G">G</button>
+    <button data-letter="H">H</button>
+    <button data-letter="I">I</button>
+    <button data-letter="J">J</button>
+    <button data-letter="K">K</button>
+    <button data-letter="L">L</button>
+    <button data-letter="M">M</button>
+    <button data-letter="N">N</button>
+    <button data-letter="O">O</button>
+    <button data-letter="P">P</button>
+    <button data-letter="Q">Q</button>
+    <button data-letter="R">R</button>
+    <button data-letter="S">S</button>
+    <button data-letter="T">T</button>
+    <button data-letter="U">U</button>
+    <button data-letter="V">V</button>
+    <button data-letter="W">W</button>
+    <button data-letter="X">X</button>
+    <button data-letter="Y">Y</button>
+    <button data-letter="Z">Z</button>
+</div>
+
+<div class="artists-grid" id="artists-grid"></div>
+
+<script type="module">
+    let allArtists = [];
+    let currentFilter = 'all';
+    let currentLetter = 'all';
+
+    async function loadArtists() {
+        const response = await fetch("/api/artists?limit=50");
+        allArtists = await response.json();
+        renderArtists();
+    }
+
+    function renderArtists() {
+        const grid = document.getElementById("artists-grid");
+        let filteredArtists = [...allArtists];
+
+        // Apply letter filter
+        if (currentLetter !== 'all') {
+            filteredArtists = filteredArtists.filter(artist =>
+                artist.artist_name.toUpperCase().startsWith(currentLetter)
+            );
+        }
+
+        // Clear grid
+        grid.innerHTML = '';
+
+        if (filteredArtists.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--color-text-secondary);">
+                    <i class="fa-solid fa-user-slash" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <p>No artists found</p>
+                </div>
+            `;
+            return;
+        }
+
+        filteredArtists.forEach(artist => {
+            const card = document.createElement('div');
+            card.className = 'artist-card';
+            card.innerHTML = `
+                <img src="${artist.profile_image_url || 'https://picsum.photos/200'}" 
+                     alt="${artist.artist_name}" 
+                     class="artist-avatar">
+                <h3 class="artist-name">${artist.artist_name}</h3>
+                <div class="artist-meta">
+                    <span><i class="fa-solid fa-record-vinyl"></i> Artist</span>
+                </div>
+                <button class="play-artist-btn" data-artist-id="${artist.artist_id}">
+                    <i class="fa-solid fa-play"></i>
+                </button>
+            `;
+
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.play-artist-btn')) {
+                    window.location.href = `/artist/${artist.artist_id}`;
+                }
+            });
+
+            const playBtn = card.querySelector('.play-artist-btn');
+            playBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                console.log('Play artist:', artist.artist_id);
+                // TODO: Load and play artist's top tracks
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentFilter = tab.getAttribute('data-filter');
+            renderArtists();
+        });
+    });
+
+    // Alphabet navigation
+    document.querySelectorAll('.alphabet-nav button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.alphabet-nav button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLetter = btn.getAttribute('data-letter');
+            renderArtists();
+        });
+    });
+
+    loadArtists();
+</script>

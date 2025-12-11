@@ -1,0 +1,560 @@
+<style>
+    .artist-hero {
+        position: relative;
+        padding: var(--spacing-2xl);
+        background: linear-gradient(180deg, rgba(29, 185, 84, 0.3) 0%, transparent 100%);
+        margin-bottom: var(--spacing-xl);
+        min-height: 400px;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .artist-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgb(29,185,84);stop-opacity:0.1" /><stop offset="100%" style="stop-color:rgb(21,143,66);stop-opacity:0.05" /></linearGradient></defs><rect width="1200" height="600" fill="url(%23grad)"/></svg>');
+        background-size: cover;
+        opacity: 0.5;
+        z-index: 0;
+    }
+
+    .artist-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: var(--spacing-xl);
+        align-items: flex-end;
+        width: 100%;
+    }
+
+    .artist-avatar-large {
+        width: 232px;
+        height: 232px;
+        min-width: 232px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: var(--shadow-lg);
+        border: 4px solid var(--color-accent);
+    }
+
+    .artist-info-detail h1 {
+        font-size: 96px;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-text-primary);
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        font-weight: var(--font-weight-bold);
+        line-height: 1;
+    }
+
+    .artist-type {
+        text-transform: uppercase;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-text-secondary);
+        letter-spacing: 1px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .artist-stats {
+        display: flex;
+        gap: var(--spacing-lg);
+        margin-top: var(--spacing-md);
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+    }
+
+    .artist-stat {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+
+    .artist-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        align-items: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .play-artist-large {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background: var(--color-accent);
+        color: #000;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .play-artist-large:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .follow-btn {
+        padding: var(--spacing-sm) var(--spacing-xl);
+        border: 1px solid var(--color-text-primary);
+        background: transparent;
+        color: var(--color-text-primary);
+        border-radius: 20px;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: all var(--transition-base);
+    }
+
+    .follow-btn:hover {
+        transform: scale(1.02);
+        border-color: var(--color-accent);
+        background: rgba(29, 185, 84, 0.1);
+    }
+
+    .follow-btn.following {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+    }
+
+    .more-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-base);
+    }
+
+    .more-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--color-text-primary);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .section-header h2 {
+        margin: 0;
+    }
+
+    .view-all-link {
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        transition: color var(--transition-fast);
+    }
+
+    .view-all-link:hover {
+        color: var(--color-text-primary);
+    }
+
+    .popular-tracks {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .track-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-sm);
+        border-radius: var(--border-radius);
+        transition: all var(--transition-fast);
+        cursor: pointer;
+    }
+
+    .track-item:hover {
+        background: rgba(29, 185, 84, 0.05);
+    }
+
+    .track-item.playing {
+        background: rgba(29, 185, 84, 0.15);
+    }
+
+    .track-number-col {
+        width: 32px;
+        text-align: center;
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+
+    .track-item:hover .track-number-col {
+        display: none;
+    }
+
+    .track-play-col {
+        width: 32px;
+        text-align: center;
+        display: none;
+    }
+
+    .track-item:hover .track-play-col {
+        display: block;
+        color: var(--color-text-primary);
+    }
+
+    .track-cover-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 4px;
+        object-fit: cover;
+    }
+
+    .track-info-col {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .track-title {
+        font-size: var(--font-size-md);
+        color: var(--color-text-primary);
+        font-weight: var(--font-weight-medium);
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .track-item.playing .track-title {
+        color: var(--color-accent);
+    }
+
+    .track-plays {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+
+    .track-duration-col {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+
+    .albums-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .album-card-compact {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-md);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        border: 1px solid var(--color-border);
+    }
+
+    .album-card-compact:hover {
+        transform: translateY(-4px);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .album-cover-compact {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: var(--border-radius);
+        margin-bottom: var(--spacing-sm);
+        object-fit: cover;
+    }
+
+    .album-title {
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-semibold);
+        margin-bottom: var(--spacing-xs);
+        color: var(--color-text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .album-year {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+
+    .bio-section {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-2xl);
+        border: 1px solid var(--color-border);
+    }
+
+    .bio-section h3 {
+        margin-bottom: var(--spacing-md);
+        color: var(--color-text-primary);
+    }
+
+    .bio-section p {
+        color: var(--color-text-secondary);
+        line-height: 1.8;
+    }
+
+    .loading {
+        text-align: center;
+        padding: var(--spacing-2xl);
+        color: var(--color-text-secondary);
+    }
+
+    .loading i {
+        font-size: 48px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div id="artist-container">
+    <div class="loading">
+        <i class="fa-solid fa-circle-notch"></i>
+        <p>Loading artist...</p>
+    </div>
+</div>
+
+<script type="module">
+    const artistId = '<%= artistId %>';
+    let artist = null;
+    let albums = [];
+    let popularTracks = [];
+
+    function formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toString();
+    }
+
+    function formatDuration(ms) {
+        if (!ms) return '0:00';
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    async function loadArtist() {
+        try {
+            // Load artist info
+            const artistResponse = await fetch(`/api/artists/${artistId}`);
+            if (!artistResponse.ok) throw new Error('Artist not found');
+            artist = await artistResponse.json();
+
+            const albumsResponse = await fetch(`/api/artists/${artistId}/albums`);
+            albums = await albumsResponse.json();
+
+            const tracksPromises = albums.map(album =>
+                fetch(`/api/albums/${album.album_id}/tracks`).then(r => r.json())
+            );
+            const allTracksArrays = await Promise.all(tracksPromises);
+            const allTracks = allTracksArrays.flat();
+
+            popularTracks = allTracks
+                .sort((a, b) => b.play_count - a.play_count)
+                .slice(0, 5);
+
+            renderArtist();
+        } catch (error) {
+            console.error('Error loading artist:', error);
+            document.getElementById('artist-container').innerHTML = `
+                <div class="empty-playlist">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <h2>Artist Not Found</h2>
+                    <p>The artist you're looking for doesn't exist.</p>
+                    <a href="/artists" data-turbo-frame="app-content" class="playlist-action-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back to Artists
+                    </a>
+                </div>
+            `;
+        }
+    }
+
+    function renderArtist() {
+        const container = document.getElementById('artist-container');
+
+        const totalPlays = popularTracks.reduce((sum, track) => sum + track.play_count, 0);
+
+        const html = `
+            <div class="artist-hero">
+                <div class="artist-content">
+                    <img src="${artist.profile_image_url || 'https://picsum.photos/232'}" 
+                         alt="${artist.artist_name}" 
+                         class="artist-avatar-large">
+                    <div class="artist-info-detail">
+                        <p class="artist-type">Artist</p>
+                        <h1>${artist.artist_name}</h1>
+                        <div class="artist-stats">
+                            <span class="artist-stat">
+                                <i class="fa-solid fa-play"></i>
+                                ${formatNumber(totalPlays)} plays
+                            </span>
+                            <span class="artist-stat">
+                                <i class="fa-solid fa-record-vinyl"></i>
+                                ${albums.length} album${albums.length !== 1 ? 's' : ''}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="artist-actions">
+                <button class="play-artist-large" id="play-artist-btn">
+                    <i class="fa-solid fa-play"></i>
+                </button>
+                <button class="follow-btn" id="follow-btn">
+                    Follow
+                </button>
+                <button class="more-btn">
+                    <i class="fa-solid fa-ellipsis"></i>
+                </button>
+            </div>
+
+            ${artist.bio ? `
+                <div class="bio-section">
+                    <h3>About</h3>
+                    <p>${artist.bio}</p>
+                </div>
+            ` : ''}
+
+            <div class="popular-tracks">
+                <div class="section-header">
+                    <h2>Popular</h2>
+                </div>
+                <div id="popular-tracks-list"></div>
+            </div>
+
+            <div class="discography">
+                <div class="section-header">
+                    <h2>Discography</h2>
+                    <a href="#" class="view-all-link">View All</a>
+                </div>
+                <div class="albums-grid" id="albums-grid"></div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        renderPopularTracks();
+        renderAlbums();
+        attachEventListeners();
+    }
+
+    function renderPopularTracks() {
+        const container = document.getElementById('popular-tracks-list');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        popularTracks.forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'track-item';
+            item.setAttribute('data-track-id', track.track_id);
+
+            item.innerHTML = `
+                <div class="track-number-col">${index + 1}</div>
+                <div class="track-play-col">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+                <img src="${track.cover_image_url || 'https://picsum.photos/48'}" 
+                     alt="${track.track_title}" 
+                     class="track-cover-thumb">
+                <div class="track-info-col">
+                    <div class="track-title">${track.track_title}</div>
+                    <div class="track-plays">${formatNumber(track.play_count)} plays</div>
+                </div>
+                <div class="track-duration-col">${formatDuration(track.duration_ms)}</div>
+            `;
+
+            item.addEventListener('click', async () => {
+                if (window.musicPlayer) {
+                    const currentTrack = window.musicPlayer.getCurrentTrack();
+                    const isPlaying = window.musicPlayer.getIsPlaying();
+
+                    if (currentTrack && currentTrack.track_id === track.track_id) {
+                        window.musicPlayer.togglePlay();
+                    } else {
+                        await window.musicPlayer.play(track);
+                    }
+                }
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    function renderAlbums() {
+        const container = document.getElementById('albums-grid');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        albums.forEach(album => {
+            const card = document.createElement('div');
+            card.className = 'album-card-compact';
+
+            card.innerHTML = `
+                <img src="${album.cover_image_url || 'https://picsum.photos/200'}" 
+                     alt="${album.album_title}" 
+                     class="album-cover-compact">
+                <div class="album-title">${album.album_title}</div>
+                ${album.release_year ? `<div class="album-year">${album.release_year}</div>` : ''}
+            `;
+
+            card.addEventListener('click', () => {
+                window.location.href = `/album/${album.album_id}`;
+            });
+
+            container.appendChild(card);
+        });
+    }
+
+    function attachEventListeners() {
+        const playBtn = document.getElementById('play-artist-btn');
+        if (playBtn && popularTracks.length > 0) {
+            playBtn.addEventListener('click', async () => {
+                if (window.musicPlayer) {
+                    await window.musicPlayer.play(popularTracks[0]);
+                }
+            });
+        }
+
+        const followBtn = document.getElementById('follow-btn');
+        if (followBtn) {
+            followBtn.addEventListener('click', () => {
+                followBtn.classList.toggle('following');
+                followBtn.textContent = followBtn.classList.contains('following') ? 'Following' : 'Follow';
+            });
+        }
+    }
+
+    loadArtist();
+</script>

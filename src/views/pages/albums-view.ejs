@@ -1,0 +1,506 @@
+<style>
+    .album-hero {
+        display: flex;
+        gap: var(--spacing-xl);
+        align-items: flex-end;
+        padding: var(--spacing-xl);
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.2) 0%, transparent 100%);
+        border-radius: var(--border-radius);
+        margin-bottom: var(--spacing-xl);
+        min-height: 340px;
+    }
+
+    .album-cover-hero {
+        width: 232px;
+        height: 232px;
+        min-width: 232px;
+        border-radius: var(--border-radius);
+        object-fit: cover;
+        box-shadow: var(--shadow-lg);
+        background: var(--color-bg-surface);
+    }
+
+    .album-info-hero {
+        flex: 1;
+    }
+
+    .album-info-hero h1 {
+        font-size: 72px;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-text-primary);
+        font-weight: var(--font-weight-bold);
+        line-height: 1;
+    }
+
+    .album-type {
+        text-transform: uppercase;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-text-secondary);
+        letter-spacing: 1px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .album-meta-hero {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-md);
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+        flex-wrap: wrap;
+    }
+
+    .album-artist-link {
+        color: var(--color-text-primary);
+        text-decoration: none;
+        font-weight: var(--font-weight-semibold);
+        transition: all var(--transition-fast);
+    }
+
+    .album-artist-link:hover {
+        text-decoration: underline;
+        color: var(--color-accent);
+    }
+
+    .album-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        align-items: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .play-album-large {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background: var(--color-accent);
+        color: #000;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .play-album-large:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .album-action-btn {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text-primary);
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .album-action-btn:hover {
+        border-color: var(--color-accent);
+        background: rgba(29, 185, 84, 0.1);
+        transform: scale(1.02);
+    }
+
+    .album-action-btn.saved {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+    }
+
+    .track-list {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .track-list-item {
+        display: grid;
+        grid-template-columns: 40px 1fr 200px 60px;
+        gap: var(--spacing-md);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--border-radius);
+        transition: all var(--transition-fast);
+        cursor: pointer;
+        align-items: center;
+    }
+
+    .track-list-item:hover {
+        background: rgba(29, 185, 84, 0.05);
+    }
+
+    .track-list-item.playing {
+        background: rgba(29, 185, 84, 0.15);
+    }
+
+    .track-number {
+        text-align: center;
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+
+    .track-list-item:hover .track-number {
+        display: none;
+    }
+
+    .track-play-icon {
+        text-align: center;
+        display: none;
+        color: var(--color-text-primary);
+    }
+
+    .track-list-item:hover .track-play-icon {
+        display: block;
+    }
+
+    .track-title-col {
+        min-width: 0;
+    }
+
+    .track-name {
+        font-size: var(--font-size-md);
+        color: var(--color-text-primary);
+        font-weight: var(--font-weight-medium);
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .track-list-item.playing .track-name {
+        color: var(--color-accent);
+    }
+
+    .track-explicit {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--color-text-secondary);
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-weight: var(--font-weight-bold);
+        margin-left: var(--spacing-xs);
+    }
+
+    .track-plays-col {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        text-align: right;
+    }
+
+    .track-duration-col {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        text-align: right;
+    }
+
+    .album-details {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-2xl);
+        border: 1px solid var(--color-border);
+    }
+
+    .album-details h3 {
+        margin-bottom: var(--spacing-md);
+        color: var(--color-text-primary);
+    }
+
+    .album-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+
+    .detail-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        text-transform: uppercase;
+        font-weight: var(--font-weight-semibold);
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: var(--font-size-lg);
+        color: var(--color-text-primary);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .loading {
+        text-align: center;
+        padding: var(--spacing-2xl);
+        color: var(--color-text-secondary);
+    }
+
+    .loading i {
+        font-size: 48px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .album-hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .album-info-hero h1 {
+            font-size: 48px;
+        }
+
+        .track-list-item {
+            grid-template-columns: 40px 1fr 60px;
+        }
+
+        .track-plays-col {
+            display: none;
+        }
+    }
+</style>
+
+<div id="album-container">
+    <div class="loading">
+        <i class="fa-solid fa-circle-notch"></i>
+        <p>Loading album...</p>
+    </div>
+</div>
+
+<script type="module">
+    const albumId = '<%= albumId %>';
+    let album = null;
+    let tracks = [];
+    let artist = null;
+
+    function formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toString();
+    }
+
+    function formatDuration(ms) {
+        if (!ms) return '0:00';
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function calculateTotalDuration(tracks) {
+        const totalMs = tracks.reduce((sum, track) => sum + (track.duration_ms || 0), 0);
+        const totalMinutes = Math.floor(totalMs / 60000);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        if (hours > 0) {
+            return `${hours} hr ${minutes} min`;
+        }
+        return `${minutes} min`;
+    }
+
+    async function loadAlbum() {
+        try {
+            const albumResponse = await fetch(`/api/albums/${albumId}`);
+            if (!albumResponse.ok) throw new Error('Album not found');
+            album = await albumResponse.json();
+
+            const tracksResponse = await fetch(`/api/albums/${albumId}/tracks`);
+            tracks = await tracksResponse.json();
+
+            const artistResponse = await fetch(`/api/albums/${albumId}/artist`);
+            artist = await artistResponse.json();
+
+            renderAlbum();
+        } catch (error) {
+            console.error('Error loading album:', error);
+            document.getElementById('album-container').innerHTML = `
+                <div class="empty-playlist">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <h2>Album Not Found</h2>
+                    <p>The album you're looking for doesn't exist.</p>
+                    <a href="/albums" data-turbo-frame="app-content" class="playlist-action-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back to Albums
+                    </a>
+                </div>
+            `;
+        }
+    }
+
+    function renderAlbum() {
+        const container = document.getElementById('album-container');
+
+        const totalPlays = tracks.reduce((sum, track) => sum + track.play_count, 0);
+        const totalDuration = calculateTotalDuration(tracks);
+
+        const html = `
+            <div class="album-hero">
+                <img src="${album.cover_image_url || 'https://picsum.photos/232'}" 
+                     alt="${album.album_title}" 
+                     class="album-cover-hero">
+                <div class="album-info-hero">
+                    <p class="album-type">Album</p>
+                    <h1>${album.album_title}</h1>
+                    <div class="album-meta-hero">
+                        ${artist ? `
+                            <a href="/artist/${artist.artist_id}" class="album-artist-link">
+                                ${artist.artist_name}
+                            </a>
+                            <span>•</span>
+                        ` : ''}
+                        ${album.release_year ? `<span>${album.release_year}</span><span>•</span>` : ''}
+                        <span>${tracks.length} song${tracks.length !== 1 ? 's' : ''}</span>
+                        <span>•</span>
+                        <span>${totalDuration}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="album-actions">
+                <button class="play-album-large" id="play-album-btn">
+                    <i class="fa-solid fa-play"></i>
+                </button>
+                <button class="album-action-btn" id="save-album-btn">
+                    <i class="fa-regular fa-heart"></i>
+                    Save
+                </button>
+                <button class="album-action-btn">
+                    <i class="fa-solid fa-ellipsis"></i>
+                </button>
+            </div>
+
+            <div class="track-list">
+                <div id="tracks-list"></div>
+            </div>
+
+            <div class="album-details">
+                <h3>Album Details</h3>
+                <div class="album-details-grid">
+                    ${album.release_year ? `
+                        <div class="detail-item">
+                            <span class="detail-label">Release Date</span>
+                            <span class="detail-value">${album.release_year}</span>
+                        </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <span class="detail-label">Total Plays</span>
+                        <span class="detail-value">${formatNumber(totalPlays)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Duration</span>
+                        <span class="detail-value">${totalDuration}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tracks</span>
+                        <span class="detail-value">${tracks.length}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        renderTracks();
+        attachEventListeners();
+    }
+
+    function renderTracks() {
+        const container = document.getElementById('tracks-list');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        tracks.forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'track-list-item';
+            item.setAttribute('data-track-id', track.track_id);
+
+            item.innerHTML = `
+                <div>
+                    <div class="track-number">${index + 1}</div>
+                    <div class="track-play-icon">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                </div>
+                <div class="track-title-col">
+                    <div class="track-name">
+                        ${track.track_title}
+                        ${track.explicit ? '<span class="track-explicit">E</span>' : ''}
+                    </div>
+                </div>
+                <div class="track-plays-col">${formatNumber(track.play_count)} plays</div>
+                <div class="track-duration-col">${formatDuration(track.duration_ms)}</div>
+            `;
+
+            item.addEventListener('click', async () => {
+                if (window.musicPlayer) {
+                    const currentTrack = window.musicPlayer.getCurrentTrack();
+                    const isPlaying = window.musicPlayer.getIsPlaying();
+
+                    if (currentTrack && currentTrack.track_id === track.track_id) {
+                        window.musicPlayer.togglePlay();
+                    } else {
+                        await window.musicPlayer.play(track);
+                    }
+                }
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    function attachEventListeners() {
+        const playBtn = document.getElementById('play-album-btn');
+        if (playBtn && tracks.length > 0) {
+            playBtn.addEventListener('click', async () => {
+                if (window.musicPlayer) {
+                    await window.musicPlayer.play(tracks[0]);
+                }
+            });
+        }
+
+        const saveBtn = document.getElementById('save-album-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                saveBtn.classList.toggle('saved');
+                const icon = saveBtn.querySelector('i');
+                if (saveBtn.classList.contains('saved')) {
+                    icon.classList.remove('fa-regular');
+                    icon.classList.add('fa-solid');
+                    saveBtn.innerHTML = '<i class="fa-solid fa-heart"></i> Saved';
+                } else {
+                    icon.classList.remove('fa-solid');
+                    icon.classList.add('fa-regular');
+                    saveBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Save';
+                }
+            });
+        }
+    }
+
+    loadAlbum();
+</script>

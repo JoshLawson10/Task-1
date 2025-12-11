@@ -1,2 +1,365 @@
-<h1>Albums</h1>
-<p>This is the Albums view.</p>
+<style>
+    .albums-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: var(--spacing-xs);
+        background: var(--color-bg-surface);
+        padding: var(--spacing-xs);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--color-border);
+    }
+
+    .view-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all var(--transition-base);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .view-btn:hover {
+        color: var(--color-text-primary);
+        background: rgba(29, 185, 84, 0.1);
+    }
+
+    .view-btn.active {
+        background: var(--color-accent);
+        color: #000;
+    }
+
+    .sort-dropdown {
+        padding: var(--spacing-sm) var(--spacing-md);
+        background: var(--color-bg-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        color: var(--color-text-primary);
+        cursor: pointer;
+        font-size: var(--font-size-sm);
+        transition: all var(--transition-base);
+    }
+
+    .sort-dropdown:hover {
+        border-color: var(--color-accent);
+    }
+
+    .albums-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .albums-grid.list-view {
+        grid-template-columns: 1fr;
+    }
+
+    .album-card {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        border: 1px solid var(--color-border);
+    }
+
+    .album-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .album-cover {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        position: relative;
+    }
+
+    .album-info {
+        padding: var(--spacing-md);
+    }
+
+    .album-title {
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--spacing-xs);
+        color: var(--color-text-primary);
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .album-artist {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .album-meta {
+        display: flex;
+        gap: var(--spacing-sm);
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+    }
+
+    /* List View Styles */
+    .albums-grid.list-view .album-card {
+        display: flex;
+        padding: var(--spacing-md);
+    }
+
+    .albums-grid.list-view .album-cover {
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+        border-radius: var(--border-radius);
+        margin-right: var(--spacing-md);
+    }
+
+    .albums-grid.list-view .album-info {
+        flex: 1;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .albums-grid.list-view .album-details {
+        flex: 1;
+    }
+
+    .albums-grid.list-view .album-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .play-album-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: var(--color-accent);
+        color: #000;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .play-album-btn:hover {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .stats {
+        display: flex;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        margin-bottom: var(--spacing-lg);
+        border: 1px solid var(--color-border);
+    }
+
+    .stat {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-accent);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+    }
+</style>
+
+<div class="albums-header">
+    <h1>Albums</h1>
+    <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+        <select class="sort-dropdown" id="sort-select">
+            <option value="recent">Recently Added</option>
+            <option value="title">Title A-Z</option>
+            <option value="artist">Artist A-Z</option>
+            <option value="year">Release Year</option>
+        </select>
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="grid">
+                <i class="fa-solid fa-grid"></i>
+            </button>
+            <button class="view-btn" data-view="list">
+                <i class="fa-solid fa-list"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <span class="stat-value" id="total-albums">0</span>
+        <span class="stat-label">Total Albums</span>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="total-artists">0</span>
+        <span class="stat-label">Artists</span>
+    </div>
+    <div class="stat">
+        <span class="stat-value" id="newest-year">2024</span>
+        <span class="stat-label">Newest Release</span>
+    </div>
+</div>
+
+<div class="albums-grid" id="albums-grid"></div>
+
+<script type="module">
+    let allAlbums = [];
+    let currentView = 'grid';
+
+    async function loadAlbums() {
+        const response = await fetch("/api/albums?limit=50");
+        allAlbums = await response.json();
+
+        document.getElementById('total-albums').textContent = allAlbums.length;
+        const uniqueArtists = new Set(allAlbums.map(a => a.artist_id));
+        document.getElementById('total-artists').textContent = uniqueArtists.size;
+        const years = allAlbums.map(a => a.release_year).filter(Boolean);
+        document.getElementById('newest-year').textContent = years.length ? Math.max(...years) : '2024';
+
+        renderAlbums();
+    }
+
+    function renderAlbums() {
+        const grid = document.getElementById("albums-grid");
+        grid.innerHTML = '';
+
+        allAlbums.forEach(album => {
+            const card = document.createElement('div');
+            card.className = 'album-card';
+
+            if (currentView === 'grid') {
+                card.innerHTML = `
+                    <img src="${album.cover_image_url || 'https://picsum.photos/300'}" 
+                         alt="${album.album_title}" 
+                         class="album-cover">
+                    <div class="album-info">
+                        <h3 class="album-title">${album.album_title}</h3>
+                        <p class="album-artist">${album.artist_name || 'Unknown Artist'}</p>
+                        <div class="album-meta">
+                            ${album.release_year ? `<span><i class="fa-solid fa-calendar"></i> ${album.release_year}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <img src="${album.cover_image_url || 'https://picsum.photos/300'}" 
+                         alt="${album.album_title}" 
+                         class="album-cover">
+                    <div class="album-info">
+                        <div class="album-details">
+                            <h3 class="album-title">${album.album_title}</h3>
+                            <p class="album-artist">${album.artist_name || 'Unknown Artist'}</p>
+                            <div class="album-meta">
+                                ${album.release_year ? `<span><i class="fa-solid fa-calendar"></i> ${album.release_year}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="album-actions">
+                            <button class="play-album-btn" data-album-id="${album.album_id}">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            card.addEventListener('click', async (e) => {
+                if (!e.target.closest('.play-album-btn')) {
+                    window.location.href = `/album/${album.album_id}`;
+                }
+            });
+
+            if (currentView === 'list') {
+                const playBtn = card.querySelector('.play-album-btn');
+                playBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await playAlbum(album.album_id);
+                });
+            }
+
+            grid.appendChild(card);
+        });
+    }
+
+    async function playAlbum(albumId) {
+        try {
+            const response = await fetch(`/api/albums/${albumId}/tracks`);
+            const tracks = await response.json();
+
+            if (tracks.length > 0 && window.musicPlayer) {
+                await window.musicPlayer.play(tracks[0]);
+            }
+        } catch (error) {
+            console.error('Error playing album:', error);
+        }
+    }
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentView = btn.getAttribute('data-view');
+
+            const grid = document.getElementById('albums-grid');
+            if (currentView === 'list') {
+                grid.classList.add('list-view');
+            } else {
+                grid.classList.remove('list-view');
+            }
+
+            renderAlbums();
+        });
+    });
+
+    document.getElementById('sort-select').addEventListener('change', (e) => {
+        const sortBy = e.target.value;
+
+        switch (sortBy) {
+            case 'title':
+                allAlbums.sort((a, b) => a.album_title.localeCompare(b.album_title));
+                break;
+            case 'artist':
+                allAlbums.sort((a, b) => (a.artist_name || '').localeCompare(b.artist_name || ''));
+                break;
+            case 'year':
+                allAlbums.sort((a, b) => (b.release_year || 0) - (a.release_year || 0));
+                break;
+            case 'recent':
+            default:
+                allAlbums.sort((a, b) => b.album_id - a.album_id);
+                break;
+        }
+
+        renderAlbums();
+    });
+
+    loadAlbums();
+</script>

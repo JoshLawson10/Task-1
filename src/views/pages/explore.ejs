@@ -1,2 +1,276 @@
-<h1>Explore</h1>
-<p>This is the Explore view.</p>
+<style>
+    .explore-hero {
+        background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-xl);
+        margin-bottom: var(--spacing-2xl);
+        color: white;
+    }
+
+    .explore-hero h1 {
+        font-size: 48px;
+        margin-bottom: var(--spacing-sm);
+        color: white;
+    }
+
+    .explore-hero p {
+        font-size: var(--font-size-lg);
+        opacity: 0.9;
+    }
+
+    .genre-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .genre-card {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-lg);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        border: 1px solid var(--color-border);
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .genre-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(29, 185, 84, 0.2) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity var(--transition-base);
+    }
+
+    .genre-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .genre-card:hover::before {
+        opacity: 1;
+    }
+
+    .genre-card h3 {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        position: relative;
+        z-index: 1;
+    }
+
+    .genre-icon {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        font-size: 48px;
+        opacity: 0.15;
+        transform: rotate(-15deg);
+    }
+
+    .mood-section {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .mood-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .mood-card {
+        background: var(--color-bg-surface);
+        border-radius: var(--border-radius);
+        padding: var(--spacing-xl);
+        border: 1px solid var(--color-border);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        text-align: center;
+    }
+
+    .mood-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .mood-emoji {
+        font-size: 64px;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .mood-card h3 {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .mood-card p {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+    }
+</style>
+
+<div class="explore-hero">
+    <h1>Explore Music</h1>
+    <p>Discover new artists, albums, and genres tailored to your taste</p>
+</div>
+
+<section class="mood-section">
+    <h2>Browse by Mood</h2>
+    <div class="mood-grid">
+        <div class="mood-card" data-mood="energetic">
+            <div class="mood-emoji">⚡</div>
+            <h3>Energetic</h3>
+            <p>High-energy tracks to pump you up</p>
+        </div>
+        <div class="mood-card" data-mood="chill">
+            <div class="mood-emoji">😌</div>
+            <h3>Chill</h3>
+            <p>Relaxing vibes for unwinding</p>
+        </div>
+        <div class="mood-card" data-mood="focus">
+            <div class="mood-emoji">🎯</div>
+            <h3>Focus</h3>
+            <p>Concentrate and get things done</p>
+        </div>
+        <div class="mood-card" data-mood="party">
+            <div class="mood-emoji">🎉</div>
+            <h3>Party</h3>
+            <p>Dance and celebrate</p>
+        </div>
+        <div class="mood-card" data-mood="workout">
+            <div class="mood-emoji">💪</div>
+            <h3>Workout</h3>
+            <p>Motivation for your fitness goals</p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Browse by Genre</h2>
+    <div class="genre-grid">
+        <div class="genre-card" data-genre="rock">
+            <i class="fa-solid fa-guitar genre-icon"></i>
+            <h3>Rock</h3>
+        </div>
+        <div class="genre-card" data-genre="pop">
+            <i class="fa-solid fa-star genre-icon"></i>
+            <h3>Pop</h3>
+        </div>
+        <div class="genre-card" data-genre="hip-hop">
+            <i class="fa-solid fa-microphone genre-icon"></i>
+            <h3>Hip Hop</h3>
+        </div>
+        <div class="genre-card" data-genre="electronic">
+            <i class="fa-solid fa-waveform genre-icon"></i>
+            <h3>Electronic</h3>
+        </div>
+        <div class="genre-card" data-genre="jazz">
+            <i class="fa-solid fa-saxophone genre-icon"></i>
+            <h3>Jazz</h3>
+        </div>
+        <div class="genre-card" data-genre="classical">
+            <i class="fa-solid fa-music genre-icon"></i>
+            <h3>Classical</h3>
+        </div>
+        <div class="genre-card" data-genre="country">
+            <i class="fa-solid fa-hat-cowboy genre-icon"></i>
+            <h3>Country</h3>
+        </div>
+        <div class="genre-card" data-genre="indie">
+            <i class="fa-solid fa-compact-disc genre-icon"></i>
+            <h3>Indie</h3>
+        </div>
+        <div class="genre-card" data-genre="r&b">
+            <i class="fa-solid fa-heart genre-icon"></i>
+            <h3>R&B</h3>
+        </div>
+        <div class="genre-card" data-genre="latin">
+            <i class="fa-solid fa-drum genre-icon"></i>
+            <h3>Latin</h3>
+        </div>
+        <div class="genre-card" data-genre="metal">
+            <i class="fa-solid fa-bolt genre-icon"></i>
+            <h3>Metal</h3>
+        </div>
+        <div class="genre-card" data-genre="folk">
+            <i class="fa-solid fa-leaf genre-icon"></i>
+            <h3>Folk</h3>
+        </div>
+    </div>
+</section>
+
+<section class="card-track" id="trending-now" style="margin-top: var(--spacing-2xl);">
+    <div class="header">
+        <h2>Trending Now</h2>
+        <a href="/songs" data-turbo-frame="app-content">View All</a>
+    </div>
+    <div class="cards"></div>
+</section>
+
+<script type="module">
+    function generateTrackCard(track) {
+        return `
+            <div class="card" data-track-id="${track.track_id}">
+                <img src="${track.cover_image_url || "https://picsum.photos/200"}" alt="${track.track_title}">
+                <div class="content">
+                    <div class="text">
+                        <h3>${track.track_title}</h3>
+                        <p>${track.artist_name || "Unknown Artist"}</p>
+                    </div>
+                    <button class="play-btn" data-track='${JSON.stringify(track)}' aria-label="Play ${track.track_title}">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function attachPlayHandlers() {
+        document.querySelectorAll('.play-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const trackData = btn.getAttribute('data-track');
+                if (trackData && window.musicPlayer) {
+                    const track = JSON.parse(trackData);
+                    await window.musicPlayer.play(track);
+                }
+            });
+        });
+    }
+
+    // Load trending tracks
+    const response = await fetch("/api/tracks/popular?limit=10");
+    const tracks = await response.json();
+
+    const container = document.getElementById("trending-now").querySelector(".cards");
+    tracks.forEach(track => {
+        container.innerHTML += generateTrackCard(track);
+    });
+
+    attachPlayHandlers();
+
+    // Add click handlers for mood and genre cards
+    document.querySelectorAll('.mood-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const mood = card.getAttribute('data-mood');
+            console.log('Selected mood:', mood);
+            // TODO: Implement mood-based filtering
+        });
+    });
+
+    document.querySelectorAll('.genre-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const genre = card.getAttribute('data-genre');
+            console.log('Selected genre:', genre);
+            // TODO: Implement genre-based filtering
+        });
+    });
+</script>
